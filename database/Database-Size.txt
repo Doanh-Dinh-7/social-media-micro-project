@@ -1,0 +1,5 @@
+Bao gồm:
+- file tạo CSDL và các bảng
+- file module
+- file tối ưu index
+- file docx chứa: Các sơ đồ mức khái niệm - Logic chuẩn 2NF - Thiết kế mức vật lý các bảng
