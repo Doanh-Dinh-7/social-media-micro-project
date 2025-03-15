@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "com.example.social_app"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.social_app"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -29,7 +29,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    buildToolsVersion = "34.0.1"
+    buildToolsVersion = "35.0.1"
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
