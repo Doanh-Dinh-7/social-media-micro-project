@@ -1,27 +1,27 @@
 # Framework chính
-fastapi>=0.103.1
-uvicorn>=0.23.2
+fastapi==0.115.11
+uvicorn==0.34.0
 
 # Database và ORM
-sqlalchemy>=2.0.21
-pyodbc>=4.0.39
-pymssql>=2.2.8  # Driver thay thế cho SQL Server
+SQLAlchemy==2.0.38
+pyodbc==5.2.0
+pymssql==2.3.2
 
 # Validation và serialization
-pydantic>=2.4.2
-pydantic_settings
-email-validator>=2.0.0
+pydantic==2.10.6
+pydantic-settings==2.8.1
+email-validator==2.2.0
 
 # Authentication và security
-python-jose>=3.3.0  # JWT
-passlib>=1.7.4  # Password hashing
-bcrypt>=4.0.1  # Thuật toán mã hóa
-python-multipart>=0.0.6  # Form data và file uploads
+python-jose==3.4.0
+passlib==1.7.4
+bcrypt==4.3.0
+python-multipart==0.0.20
 
 # Xử lý file và biến môi trường
-aiofiles>=23.2.1  # Xử lý file bất đồng bộ
-python-dotenv>=1.0.0  # Đọc biến môi trường từ file .env
+aiofiles==24.1.0
+python-dotenv==1.0.1
 
 # Tiện ích
-pillow>=10.0.1  # Xử lý hình ảnh
-uuid>=1.30  # Tạo ID duy nhất
+pillow==11.1.0
+uuid==1.30
