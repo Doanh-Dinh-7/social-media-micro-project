@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.social_app.model.BaiViet;
 import com.example.social_app.view.activities.LoginActivity;
-import com.example.social_app.viewmodel.PostViewModel;
+//import com.example.social_app.viewmodel.PostViewModel;
 
 public class MainActivity extends AppCompatActivity {
 

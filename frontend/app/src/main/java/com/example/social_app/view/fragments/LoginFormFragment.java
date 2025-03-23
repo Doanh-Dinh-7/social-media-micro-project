@@ -48,7 +48,13 @@ public class LoginFormFragment extends Fragment {
         btnNext = view.findViewById(R.id.btn_next);
 
         btnNext.setOnClickListener(v -> {
-            Toast.makeText(getActivity(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+            String email = edtEmail.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim();
+
+            if (getActivity() instanceof LoginActivity) {
+                ((LoginActivity) getActivity()).loginUser(email, password);
+            }
             updateButtonState();
         });
 

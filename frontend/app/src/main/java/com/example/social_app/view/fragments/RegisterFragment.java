@@ -3,6 +3,7 @@ package com.example.social_app.view.fragments;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +28,7 @@ public class RegisterFragment extends Fragment {
     private Button btnContinue;
     private ImageButton btnBack;
     private CheckBox cbTerms;
-    private TextInputEditText edtEmail, edtPassword, etConfirmPassword;;
+    private TextInputEditText edtEmail, edtPassword, etConfirmPassword;
 
     // Constructor rỗng (bắt buộc cho Fragment)
     public RegisterFragment() {
@@ -44,7 +46,25 @@ public class RegisterFragment extends Fragment {
 
         btnContinue = view.findViewById(R.id.btn_continue);
 
-        btnContinue.setOnClickListener(v -> ((RegisterActivity) getActivity()).goToSuccess());
+//        btnContinue.setOnClickListener(v -> ((RegisterActivity) getActivity()).goToSuccess());
+        btnContinue.setOnClickListener(v -> {
+            String email = edtEmail.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim();
+            String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(getContext(), "Mật khẩu xác nhận không khớp!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Thêm log để debug
+            Log.d("DEBUG", "Email: " + email);
+            Log.d("DEBUG", "Password: " + password);
+
+            ((RegisterActivity) getActivity()).registerUser("", email, password);
+        });
+
+//        ((RegisterActivity) getActivity()).registerUser("", edtEmail.toString(), edtPassword.toString()));
 
 
         // Ánh xạ view
