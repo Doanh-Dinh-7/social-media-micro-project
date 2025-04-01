@@ -20,7 +20,7 @@ CREATE TABLE TaiKhoan (
     Email NVARCHAR(255) NOT NULL UNIQUE,
     MatKhau NVARCHAR(255) NOT NULL,
     TrangThai TINYINT DEFAULT 1,
-    CONSTRAINT FK_TaiKhoan_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung)
+    CONSTRAINT FK_TaiKhoan_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE
 );
 
 -- Tạo bảng BanBe
@@ -29,8 +29,8 @@ CREATE TABLE BanBe (
     MaBanBe INT,
     NgayTao DATETIME NOT NULL DEFAULT GETDATE(),
     PRIMARY KEY (MaNguoiDung, MaBanBe),
-    CONSTRAINT FK_BanBe_NguoiDung1 FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung),
-    CONSTRAINT FK_BanBe_NguoiDung2 FOREIGN KEY (MaBanBe) REFERENCES NguoiDung(MaNguoiDung)
+    CONSTRAINT FK_BanBe_NguoiDung1 FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE,
+    CONSTRAINT FK_BanBe_NguoiDung2 FOREIGN KEY (MaBanBe) REFERENCES NguoiDung(MaNguoiDung) 
 );
 
 -- Tạo bảng LoiMoiKetBan
@@ -40,7 +40,7 @@ CREATE TABLE LoiMoiKetBan (
     NguoiNhan INT NOT NULL,
     TrangThai TINYINT DEFAULT 0,
     ThoiGian DATETIME NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT FK_LoiMoiKetBan_NguoiGui FOREIGN KEY (NguoiGui) REFERENCES NguoiDung(MaNguoiDung),
+    CONSTRAINT FK_LoiMoiKetBan_NguoiGui FOREIGN KEY (NguoiGui) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE,
     CONSTRAINT FK_LoiMoiKetBan_NguoiNhan FOREIGN KEY (NguoiNhan) REFERENCES NguoiDung(MaNguoiDung)
 );
 
@@ -65,7 +65,7 @@ CREATE TABLE BaiViet (
     NgayTao DATETIME NOT NULL DEFAULT GETDATE(),
     NgayCapNhat DATETIME,
     NoiDung NVARCHAR(MAX) NOT NULL,
-    CONSTRAINT FK_BaiViet_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung),
+    CONSTRAINT FK_BaiViet_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE,
     CONSTRAINT FK_BaiViet_QuyenRiengTu FOREIGN KEY (MaQuyenRiengTu) REFERENCES QuyenRiengTu(MaQuyenRiengTu),
     CONSTRAINT FK_BaiViet_ChuDe FOREIGN KEY (MaChuDe) REFERENCES ChuDe(MaChuDe)
 );
@@ -77,8 +77,8 @@ CREATE TABLE BinhLuan (
     MaNguoiDung INT NOT NULL,
     NgayTao DATETIME NOT NULL DEFAULT GETDATE(),
     NoiDung NVARCHAR(MAX) NOT NULL,
-    CONSTRAINT FK_BinhLuan_BaiViet FOREIGN KEY (MaBaiViet) REFERENCES BaiViet(MaBaiViet),
-    CONSTRAINT FK_BinhLuan_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung)
+    CONSTRAINT FK_BinhLuan_BaiViet FOREIGN KEY (MaBaiViet) REFERENCES BaiViet(MaBaiViet) ON DELETE CASCADE,
+    CONSTRAINT FK_BinhLuan_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE
 );
 
 -- Tạo bảng LuotThich
@@ -87,7 +87,7 @@ CREATE TABLE LuotThich (
     MaBaiViet INT NOT NULL,
     MaNguoiDung INT NOT NULL,
     NgayTao DATETIME NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT FK_LuotThich_BaiViet FOREIGN KEY (MaBaiViet) REFERENCES BaiViet(MaBaiViet),
+    CONSTRAINT FK_LuotThich_BaiViet FOREIGN KEY (MaBaiViet) REFERENCES BaiViet(MaBaiViet) ON DELETE CASCADE,
     CONSTRAINT FK_LuotThich_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung)
 );
 
@@ -96,7 +96,7 @@ CREATE TABLE HinhAnh (
     MaHinhAnh INT IDENTITY(1,1) PRIMARY KEY,
     MaBaiDang INT NOT NULL,
     Url NVARCHAR(500) NOT NULL,
-    CONSTRAINT FK_HinhAnh_BaiViet FOREIGN KEY (MaBaiDang) REFERENCES BaiViet(MaBaiViet)
+    CONSTRAINT FK_HinhAnh_BaiViet FOREIGN KEY (MaBaiDang) REFERENCES BaiViet(MaBaiViet) ON DELETE CASCADE
 );
 
 -- Tạo bảng CuocTroChuyen
@@ -106,7 +106,7 @@ CREATE TABLE CuocTroChuyen (
     NguoiDung_2 INT NOT NULL,
     TinNhanCuoi INT,
     NgayTao DATETIME NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT FK_CuocTroChuyen_NguoiDung1 FOREIGN KEY (NguoiDung_1) REFERENCES NguoiDung(MaNguoiDung),
+    CONSTRAINT FK_CuocTroChuyen_NguoiDung1 FOREIGN KEY (NguoiDung_1) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE,
     CONSTRAINT FK_CuocTroChuyen_NguoiDung2 FOREIGN KEY (NguoiDung_2) REFERENCES NguoiDung(MaNguoiDung)
 );
 
@@ -118,7 +118,7 @@ CREATE TABLE TinNhan (
     NoiDung NVARCHAR(MAX) NOT NULL,
     NgayGui DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_TinNhan_NguoiDung FOREIGN KEY (MaNguoiGui) REFERENCES NguoiDung(MaNguoiDung),
-    CONSTRAINT FK_TinNhan_CuocTroChuyen FOREIGN KEY (MaCuocTroChuyen) REFERENCES CuocTroChuyen(MaCuocTroChuyen)
+    CONSTRAINT FK_TinNhan_CuocTroChuyen FOREIGN KEY (MaCuocTroChuyen) REFERENCES CuocTroChuyen(MaCuocTroChuyen) ON DELETE CASCADE
 );
 
 -- Cập nhật khóa ngoại cho TinNhanCuoi trong bảng CuocTroChuyen
@@ -132,7 +132,7 @@ CREATE TABLE ThongBao (
     NoiDung NVARCHAR(MAX) NOT NULL,
     ThoiGian DATETIME NOT NULL DEFAULT GETDATE(),
     DaDoc TINYINT DEFAULT 0,
-    CONSTRAINT FK_ThongBao_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung)
+    CONSTRAINT FK_ThongBao_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE
 );
 
 -- Tạo bảng GoiYKetBan
@@ -141,7 +141,7 @@ CREATE TABLE GoiYKetBan (
     NguoiGoiY INT NOT NULL,
     NguoiDuocGoiY INT NOT NULL,
     TrangThai TINYINT DEFAULT 0,
-    CONSTRAINT FK_GoiYKetBan_NguoiGoiY FOREIGN KEY (NguoiGoiY) REFERENCES NguoiDung(MaNguoiDung),
+    CONSTRAINT FK_GoiYKetBan_NguoiGoiY FOREIGN KEY (NguoiGoiY) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE, 
     CONSTRAINT FK_GoiYKetBan_NguoiDuocGoiY FOREIGN KEY (NguoiDuocGoiY) REFERENCES NguoiDung(MaNguoiDung)
 );
 
