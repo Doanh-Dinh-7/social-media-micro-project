@@ -78,7 +78,7 @@ CREATE TABLE BinhLuan (
     NgayTao DATETIME NOT NULL DEFAULT GETDATE(),
     NoiDung NVARCHAR(MAX) NOT NULL,
     CONSTRAINT FK_BinhLuan_BaiViet FOREIGN KEY (MaBaiViet) REFERENCES BaiViet(MaBaiViet) ON DELETE CASCADE,
-    CONSTRAINT FK_BinhLuan_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung) ON DELETE CASCADE
+    CONSTRAINT FK_BinhLuan_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES NguoiDung(MaNguoiDung) 
 );
 
 -- Tạo bảng LuotThich
