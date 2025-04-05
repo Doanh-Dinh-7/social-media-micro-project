@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.social_app.R;
 import com.example.social_app.view.activities.LoginActivity;
+import com.example.social_app.view.activities.PostActivity;
 import com.example.social_app.view.activities.RegisterActivity;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -48,14 +49,12 @@ public class LoginFormFragment extends Fragment {
         btnNext = view.findViewById(R.id.btn_next);
 
         btnNext.setOnClickListener(v -> {
-//            Toast.makeText(getActivity(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
             String email = edtEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
 
             if (getActivity() instanceof LoginActivity) {
                 ((LoginActivity) getActivity()).loginUser(email, password);
             }
-            updateButtonState();
         });
 
         TextWatcher textWatcher = new TextWatcher() {
@@ -80,7 +79,7 @@ public class LoginFormFragment extends Fragment {
         String email = edtEmail.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
 
-        if (!email.isEmpty() && !password.isEmpty()) {
+        if (!email.isEmpty() && !password.isEmpty() && password.length() >= 6) {
             btnNext.setEnabled(true);
         } else {
             btnNext.setEnabled(false);

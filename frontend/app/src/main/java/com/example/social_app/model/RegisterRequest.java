@@ -1,5 +1,5 @@
 package com.example.social_app.model;
-
+//
 public class RegisterRequest {
     private String TenNguoiDung;
     private String Email;
@@ -23,3 +23,4 @@ public class RegisterRequest {
         return MatKhau;
     }
 }
+

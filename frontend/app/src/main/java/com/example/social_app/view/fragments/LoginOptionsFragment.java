@@ -25,6 +25,7 @@ public class LoginOptionsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login_options, container, false);
         Button btnLogin = view.findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(v -> ((LoginActivity) getActivity()).goToLoginForm());
+//        btnLogin.setOnClickListener(v -> ((LoginActivity) getActivity()).goToPost());
 
         TextView txtRegister = view.findViewById(R.id.txtRegister);
         txtRegister.setOnClickListener(v -> {

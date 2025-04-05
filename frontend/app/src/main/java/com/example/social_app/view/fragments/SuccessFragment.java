@@ -25,7 +25,9 @@ public class SuccessFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_success, container, false);
 
         btnStart = view.findViewById(R.id.btn_start);
-        btnStart.setOnClickListener(v -> ((RegisterActivity) getActivity()).goToUserInfor());
+        btnStart.setOnClickListener(v -> {
+            String email = getArguments() != null ? getArguments().getString("EMAIL", ""): "";
+            ((RegisterActivity) getActivity()).goToUserInfor(email);});
 
         return view;
     }

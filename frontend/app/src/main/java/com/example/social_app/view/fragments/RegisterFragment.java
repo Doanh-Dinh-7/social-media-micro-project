@@ -30,6 +30,7 @@ public class RegisterFragment extends Fragment {
     private CheckBox cbTerms;
     private TextInputEditText edtEmail, edtPassword, etConfirmPassword;
 
+
     // Constructor rỗng (bắt buộc cho Fragment)
     public RegisterFragment() {
         // Required empty public constructor
@@ -61,7 +62,10 @@ public class RegisterFragment extends Fragment {
             Log.d("DEBUG", "Email: " + email);
             Log.d("DEBUG", "Password: " + password);
 
-            ((RegisterActivity) getActivity()).registerUser("", email, password);
+
+                if (getActivity() instanceof RegisterActivity) {
+                    ((RegisterActivity) getActivity()).registerUser(email, password);
+                }
         });
 
 //        ((RegisterActivity) getActivity()).registerUser("", edtEmail.toString(), edtPassword.toString()));
@@ -106,7 +110,7 @@ public class RegisterFragment extends Fragment {
         String confirmPassword = etConfirmPassword.getText().toString().trim();
         boolean isChecked = cbTerms.isChecked();
 
-        if (!email.isEmpty() && !password.isEmpty() && !confirmPassword.isEmpty() && isChecked && password.equals(confirmPassword)) {
+        if (!email.isEmpty() && !password.isEmpty() &&  password.length() >= 6 && !confirmPassword.isEmpty() && isChecked && password.equals(confirmPassword)) {
             btnContinue.setEnabled(true);
         } else {
             btnContinue.setEnabled(false);

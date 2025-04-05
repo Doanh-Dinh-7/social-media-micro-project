@@ -46,9 +46,17 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void goToSuccess() { loadFragment(new SuccessFragment());}
-    public void goToUserInfor() { loadFragment(new UserInforFragment());}
-    public void registerUser(String tenNguoiDung, String email, String password) {
-        RegisterRequest request = new RegisterRequest(tenNguoiDung, email, password);
+    public void goToUserInfor(String email) {
+        Bundle bundle = new Bundle();
+        bundle.putString("EMAIL", email);
+
+        UserInforFragment userInforFragment = new UserInforFragment();
+        userInforFragment.setArguments(bundle);
+
+        loadFragment(userInforFragment);
+    }
+    public void registerUser(String email, String matKhau) {
+        RegisterRequest request = new RegisterRequest("user", email, matKhau);
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
 
         apiService.register(request).enqueue(new Callback<RegisterResponse>() {
@@ -56,11 +64,9 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+
                     // Chuyển sang màn hình đăng nhập
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    intent.putExtra("EMAIL", email);
-                    startActivity(intent);
-                    finish();
+                    goToSuccess();
                 } else {
                     Toast.makeText(RegisterActivity.this, "Đăng ký thất bại!", Toast.LENGTH_SHORT).show();
                 }

@@ -17,6 +17,7 @@ import com.example.social_app.network.ApiService;
 import com.example.social_app.network.RetrofitClient;
 import com.example.social_app.view.fragments.LoginFormFragment;
 import com.example.social_app.view.fragments.LoginOptionsFragment;
+import com.example.social_app.view.fragments.PostFragment;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,12 +65,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     // Kiểm tra nếu access_token tồn tại
-                    if (response.body().getAccessToken() != null && !response.body().getAccessToken().isEmpty()) {
+                        String accessToken = response.body().getAccessToken();
+                        if (accessToken != null && !accessToken.isEmpty()){
+                        getSharedPreferences("user_data", MODE_PRIVATE).edit().putString("auth_token", accessToken).apply();
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         // Chuyển sang MainActivity
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, PostActivity.class);
                         startActivity(intent);
-                        finish(); // Đóng màn hình đăng nhập
+                         // Đóng màn hình đăng nhập
+
                     } else {
                         Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
                     }

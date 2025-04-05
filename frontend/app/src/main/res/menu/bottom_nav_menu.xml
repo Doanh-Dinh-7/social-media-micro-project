@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@mipmap/home"
+        android:title="Trang chủ"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/nav_post"
+        android:icon="@mipmap/add"
+        android:title="Bài viết"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/nav_notification"
+        android:icon="@mipmap/notification"
+        android:title="Thông báo"
+        android:checkable="true"/>
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@mipmap/leaf"
+        android:title="Hồ sơ"
+        android:checkable="true"/>
+
+</menu>
