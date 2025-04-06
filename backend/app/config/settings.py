@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     DB_SERVER: str = os.getenv("DB_SERVER")
     DB_NAME: str = os.getenv("DB_NAME")
     
+    # Cấu hình Cloudinary
+    CLOUDINARY_CLOUD_NAME: str = os.getenv("CLOUDINARY_CLOUD_NAME")
+    CLOUDINARY_API_KEY: str = os.getenv("CLOUDINARY_API_KEY")
+    CLOUDINARY_API_SECRET: str = os.getenv("CLOUDINARY_API_SECRET")
+
     # Cấu hình lưu trữ file
     UPLOAD_FOLDER: str = "uploads"
     MAX_CONTENT_LENGTH: int = 16 * 1024 * 1024  # 16MB

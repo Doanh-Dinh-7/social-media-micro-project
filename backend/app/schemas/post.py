@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 from app.schemas.user import UserResponse
+from fastapi import UploadFile, File
 
 class PostImageBase(BaseModel):
     Url: str
@@ -22,7 +23,7 @@ class PostBase(BaseModel):
     MaChuDe: Optional[int] = None
 
 class PostCreate(PostBase):
-    pass
+    pass  # Remove images field from here as it will be handled in the router
 
 class PostUpdate(BaseModel):
     NoiDung: Optional[str] = None

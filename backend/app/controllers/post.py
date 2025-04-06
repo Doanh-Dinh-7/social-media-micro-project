@@ -7,6 +7,8 @@ import os
 import uuid
 from datetime import datetime
 from app.config.settings import settings
+from app.utils.cloudinary import upload_image
+import cloudinary
 
 class PostController:
     @staticmethod
@@ -16,40 +18,50 @@ class PostController:
         images: Optional[List[UploadFile]] = None,
         db: Session = None
     ):
-        # Tạo bài viết mới
-        new_post = BaiViet(
-            MaNguoiDung=user_id,
-            MaQuyenRiengTu=post_data.MaQuyenRiengTu,
-            MaChuDe=post_data.MaChuDe,
-            NoiDung=post_data.NoiDung
-        )
-        db.add(new_post)
-        db.flush()
-        
-        # Xử lý hình ảnh nếu có
-        if images:
-            for image in images:
-                # Tạo tên file duy nhất
-                file_extension = os.path.splitext(image.filename)[1]
-                unique_filename = f"{uuid.uuid4()}{file_extension}"
-                file_path = os.path.join(settings.UPLOAD_FOLDER, unique_filename)
-                
-                # Lưu file
-                with open(file_path, "wb") as buffer:
-                    buffer.write(await image.read())
-                
-                # Lưu thông tin hình ảnh vào database
-                new_image = HinhAnh(
-                    MaBaiDang=new_post.MaBaiViet,
-                    Url=f"/uploads/{unique_filename}"
-                )
-                db.add(new_image)
-        
-        db.commit()
-        db.refresh(new_post)
-        
-        # Lấy bài viết với thông tin đầy đủ
-        return await PostController.get_post_by_id(new_post.MaBaiViet, user_id, db)
+        try:
+            # Tạo bài viết mới
+            new_post = BaiViet(
+                MaNguoiDung=user_id,
+                MaQuyenRiengTu=post_data.MaQuyenRiengTu,
+                MaChuDe=post_data.MaChuDe,
+                NoiDung=post_data.NoiDung
+            )
+            db.add(new_post)
+            db.flush()  # Get the post ID without committing
+            
+            # Xử lý hình ảnh nếu có
+            if images:
+                for image in images:
+                    try:
+                        # Upload image to Cloudinary
+                        result = await upload_image(await image.read())
+                        
+                        # Lưu thông tin hình ảnh vào database
+                        new_image = HinhAnh(
+                            MaBaiDang=new_post.MaBaiViet,
+                            Url=result['secure_url']  # Sử dụng secure_url từ Cloudinary
+                        )
+                        db.add(new_image)
+                    except Exception as e:
+                        # Nếu có lỗi khi upload ảnh, rollback transaction
+                        db.rollback()
+                        raise HTTPException(
+                            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=f"Lỗi khi upload ảnh: {str(e)}"
+                        )
+            
+            db.commit()
+            db.refresh(new_post)
+            
+            # Lấy bài viết với thông tin đầy đủ
+            return await PostController.get_post_by_id(new_post.MaBaiViet, user_id, db)
+            
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Lỗi khi tạo bài viết: {str(e)}"
+            )
     
     @staticmethod
     async def get_post_by_id(post_id: int, user_id: int, db: Session):
@@ -158,10 +170,15 @@ class PostController:
         # Xóa hình ảnh liên quan
         images = db.query(HinhAnh).filter(HinhAnh.MaBaiDang == post_id).all()
         for image in images:
-            # Xóa file hình ảnh
-            file_path = os.path.join(os.getcwd(), image.Url.lstrip('/'))
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            try:
+                # Xóa ảnh từ Cloudinary
+                public_id = image.Url.split('/')[-1].split('.')[0]  # Lấy public_id từ URL
+                cloudinary.uploader.destroy(public_id)
+            except Exception as e:
+                # Log lỗi nhưng vẫn tiếp tục xóa bài viết
+                print(f"Error deleting image from Cloudinary: {str(e)}")
+            
+            # Xóa record trong database
             db.delete(image)
         
         # Xóa lượt thích

@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile,
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.schemas.post import PostCreate, PostResponse, PostUpdate
+from app.models.post import HinhAnh
 from app.controllers.post import PostController
 from app.utils.security import get_current_active_user
 from typing import List, Optional
+import cloudinary
 
 router = APIRouter(
     prefix="/posts",
@@ -24,16 +26,19 @@ async def create_post(
     """
     Tạo bài viết mới
     """
+    # Create post data
     post_data = PostCreate(
         NoiDung=noi_dung,
         MaQuyenRiengTu=ma_quyen_rieng_tu,
         MaChuDe=ma_chu_de
     )
+
+    # Create post and handle image uploads
     return await PostController.create_post(
-        post_data, 
-        current_user["nguoi_dung"].MaNguoiDung, 
-        images, 
-        db
+        post_data=post_data,
+        user_id=current_user["nguoi_dung"].MaNguoiDung,
+        images=images,
+        db=db
     )
 
 @router.get("/{post_id}", response_model=PostResponse)
