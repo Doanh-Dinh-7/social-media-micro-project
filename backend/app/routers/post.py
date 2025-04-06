@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from app.config.database import get_db
-from app.schemas.post import PostCreate, PostResponse, PostUpdate
+from app.schemas.post import PostCreate, PostResponse, PostUpdate, CommentCreate, CommentResponse, LikeCreate, LikeResponse
 from app.models.post import HinhAnh
-from app.controllers.post import PostController
+from app.controllers.post import PostController, CommentController, LikeController
 from app.utils.security import get_current_active_user
+from app.middleware.auth import get_current_user
 from typing import List, Optional
 import cloudinary
 
@@ -104,3 +105,76 @@ async def delete_post(
         current_user["nguoi_dung"].MaNguoiDung, 
         db
     )
+
+# Bình luận
+@router.get("/{ma_bai_viet}/binh-luan", response_model=List[CommentResponse])
+def get_binh_luan_by_bai_viet(
+    ma_bai_viet: int,
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db)
+):
+    """
+    Lấy danh sách bình luận của một bài viết
+    """
+    return CommentController.get_binh_luan_by_bai_viet(db, ma_bai_viet, skip, limit)
+
+@router.post("/{ma_bai_viet}/binh-luan", response_model=CommentResponse)
+def create_binh_luan(
+    ma_bai_viet: int,
+    binh_luan: CommentCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Tạo bình luận cho bài viết
+    """
+    return CommentController.create_binh_luan(db, binh_luan, current_user["nguoi_dung"].MaNguoiDung)
+
+@router.delete("/{ma_bai_viet}/binh-luan/{ma_binh_luan}")
+def delete_binh_luan(
+    ma_bai_viet: int,
+    ma_binh_luan: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Xóa bình luận
+    """
+    return CommentController.delete_binh_luan(db, ma_bai_viet, ma_binh_luan, current_user["nguoi_dung"].MaNguoiDung)
+
+
+# Lượt thích
+@router.get("/{ma_bai_viet}/luot-thich", response_model=List[LikeResponse])
+def get_luot_thich_by_bai_viet(
+    ma_bai_viet: int,
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db)
+):
+    """
+    Lấy danh sách lượt thích của một bài viết
+    """
+    return LikeController.get_luot_thich_by_bai_viet(db, ma_bai_viet, skip, limit)
+
+@router.post("/{ma_bai_viet}/luot-thich", response_model=LikeResponse)
+def create_luot_thich(
+    ma_bai_viet: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Thêm lượt thích cho bài viết
+    """
+    return LikeController.create_luot_thich(db, ma_bai_viet, current_user["nguoi_dung"].MaNguoiDung)
+
+@router.delete("/{ma_bai_viet}/luot-thich")
+def delete_luot_thich(
+    ma_bai_viet: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Bỏ lượt thích bài viết
+    """
+    return LikeController.delete_luot_thich(db, ma_bai_viet, current_user["nguoi_dung"].MaNguoiDung)

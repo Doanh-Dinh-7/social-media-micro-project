@@ -85,3 +85,31 @@ class TopicResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+class BinhLuanBase(BaseModel):
+    NoiDung: str = Field(..., min_length=1, max_length=1000)
+
+class CommentCreate(BinhLuanBase):
+    MaBaiViet: int
+
+class CommentResponse(BinhLuanBase):
+    MaBinhLuan: int
+    MaBaiViet: int
+    MaNguoiDung: int
+    NgayTao: datetime
+    TenNguoiDung: str = None
+
+    class Config:
+        from_attributes = True
+
+class LuotThichBase(BaseModel):
+    MaBaiViet: int
+
+class LikeResponse(LuotThichBase):
+    MaLuotThich: int
+    MaNguoiDung: int
+    NgayTao: datetime
+    TenNguoiDung: str = None
+
+    class Config:
+        from_attributes = True

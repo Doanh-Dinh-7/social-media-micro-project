@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 from app.models.post import BaiViet, HinhAnh, BinhLuan, LuotThich
-from app.schemas.post import PostCreate, PostResponse, PostUpdate
+from app.schemas.post import PostCreate, PostResponse, PostUpdate, CommentCreate, CommentResponse, LikeResponse
 from typing import List, Optional
 import os
 import uuid
@@ -192,3 +193,118 @@ class PostController:
         db.commit()
         
         return {"message": "Bài viết đã được xóa thành công"}
+
+class CommentController:
+    @staticmethod
+    def get_binh_luan_by_bai_viet(db: Session, ma_bai_viet: int, skip: int = 0, limit: int = 10):
+        binh_luan = db.query(BinhLuan).filter(BinhLuan.MaBaiViet == ma_bai_viet)\
+            .order_by(desc(BinhLuan.NgayTao))\
+            .offset(skip).limit(limit).all()
+        
+        # Lấy thông tin người dùng cho mỗi bình luận
+        result = []
+        for bl in binh_luan:
+            bl_dict = CommentResponse.from_orm(bl).dict()
+            bl_dict["TenNguoiDung"] = bl.nguoi_dung.TenNguoiDung
+            result.append(bl_dict)
+        
+        return result
+
+    @staticmethod
+    def create_binh_luan(db: Session, binh_luan: CommentCreate, ma_nguoi_dung: int):
+        # Kiểm tra bài viết có tồn tại không
+        bai_viet = db.query(BaiViet).filter(BaiViet.MaBaiViet == binh_luan.MaBaiViet).first()
+        if not bai_viet:
+            raise HTTPException(status_code=404, detail="Bài viết không tồn tại")
+
+        db_binh_luan = BinhLuan(
+            MaBaiViet=binh_luan.MaBaiViet,
+            MaNguoiDung=ma_nguoi_dung,
+            NoiDung=binh_luan.NoiDung,
+            NgayTao=datetime.now()
+        )
+        db.add(db_binh_luan)
+        db.commit()
+        db.refresh(db_binh_luan)
+        
+        # Lấy thông tin người dùng
+        bl_dict = CommentResponse.from_orm(db_binh_luan).dict()
+        bl_dict["TenNguoiDung"] = db_binh_luan.nguoi_dung.TenNguoiDung
+        
+        return bl_dict
+    
+    @staticmethod
+    def delete_binh_luan(db: Session, ma_bai_viet: int, ma_binh_luan: int, ma_nguoi_dung: int):
+        binh_luan = db.query(BinhLuan).filter(
+            BinhLuan.MaBaiViet == ma_bai_viet,
+            BinhLuan.MaBinhLuan == ma_binh_luan,
+            BinhLuan.MaNguoiDung == ma_nguoi_dung
+        ).first()
+        if not binh_luan:
+            raise HTTPException(status_code=404, detail="Bình luận không tồn tại")
+        
+        db.delete(binh_luan)
+        db.commit()
+        return {"message": "Đã xóa bình luận"}
+    
+
+class LikeController:
+    @staticmethod
+    def get_luot_thich_by_bai_viet(db: Session, ma_bai_viet: int, skip: int = 0, limit: int = 10):
+        luot_thich = db.query(LuotThich).filter(LuotThich.MaBaiViet == ma_bai_viet)\
+            .order_by(desc(LuotThich.NgayTao))\
+            .offset(skip).limit(limit).all()
+        
+        # Lấy thông tin người dùng cho mỗi lượt thích
+        result = []
+        for lt in luot_thich:
+            lt_dict = LikeResponse.from_orm(lt).dict()
+            lt_dict["TenNguoiDung"] = lt.nguoi_dung.TenNguoiDung
+            result.append(lt_dict)
+        
+        return result
+
+    @staticmethod
+    def create_luot_thich(db: Session, ma_bai_viet: int, ma_nguoi_dung: int):
+        # Kiểm tra bài viết có tồn tại không
+        bai_viet = db.query(BaiViet).filter(BaiViet.MaBaiViet == ma_bai_viet).first()
+        if not bai_viet:
+            raise HTTPException(status_code=404, detail="Bài viết không tồn tại")
+
+        # Kiểm tra đã thích chưa
+        existing_like = db.query(LuotThich).filter(
+            LuotThich.MaBaiViet == ma_bai_viet,
+            LuotThich.MaNguoiDung == ma_nguoi_dung
+        ).first()
+        
+        if existing_like:
+            raise HTTPException(status_code=400, detail="Bạn đã thích bài viết này")
+
+        db_luot_thich = LuotThich(
+            MaBaiViet=ma_bai_viet,
+            MaNguoiDung=ma_nguoi_dung,
+            NgayTao=datetime.now()
+        )
+        db.add(db_luot_thich)
+        db.commit()
+        db.refresh(db_luot_thich)
+        
+        # Lấy thông tin người dùng
+        lt_dict = LikeResponse.from_orm(db_luot_thich).dict()
+        lt_dict["TenNguoiDung"] = db_luot_thich.nguoi_dung.TenNguoiDung
+        
+        return lt_dict
+
+    @staticmethod
+    def delete_luot_thich(db: Session, ma_bai_viet: int, ma_nguoi_dung: int):
+        luot_thich = db.query(LuotThich).filter(
+            LuotThich.MaBaiViet == ma_bai_viet,
+            LuotThich.MaNguoiDung == ma_nguoi_dung
+        ).first()
+        
+        if not luot_thich:
+            raise HTTPException(status_code=404, detail="Bạn chưa thích bài viết này")
+        
+        db.delete(luot_thich)
+        db.commit()
+        return {"message": "Đã bỏ thích bài viết"}
