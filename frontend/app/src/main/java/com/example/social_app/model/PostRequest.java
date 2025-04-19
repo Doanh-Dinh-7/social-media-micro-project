@@ -9,7 +9,7 @@ public class PostRequest {
     private List<String> images;
 
     // Constructor
-    public PostRequest(String noi_dung, int ma_quyen_rieng_tu, int ma_chu_de, List<String> images) {
+    public PostRequest(String noi_dung, int ma_quyen_rieng_tu, Integer ma_chu_de, List<String> images) {
         this.noi_dung = noi_dung;
         this.ma_quyen_rieng_tu = ma_quyen_rieng_tu;
         this.ma_chu_de = ma_chu_de;

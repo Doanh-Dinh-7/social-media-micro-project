@@ -1,8 +1,9 @@
 package com.example.social_app.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PostResponse {
+public class PostResponse  implements Serializable {
 
     private String NoiDung;
     private int MaQuyenRiengTu;
@@ -12,7 +13,7 @@ public class PostResponse {
     private String NgayTao;
     private String NgayCapNhat;
     private NguoiDung nguoi_dung;
-    private List<String> hinh_anh;
+    private List<HinhAnh> hinh_anh;
     private int so_luot_thich;
     private int so_binh_luan;
     private boolean da_thich;
@@ -82,11 +83,11 @@ public class PostResponse {
         this.nguoi_dung = nguoi_dung;
     }
 
-    public List<String> getHinh_anh() {
+    public List<HinhAnh> getHinh_anh() {
         return hinh_anh;
     }
 
-    public void setHinh_anh(List<String> hinh_anh) {
+    public void setHinh_anh(List<HinhAnh> hinh_anh) {
         this.hinh_anh = hinh_anh;
     }
 

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.social_app.R;
 import com.example.social_app.view.fragments.CreatePostFragment;
+import com.example.social_app.view.fragments.LoginFormFragment;
 import com.example.social_app.view.fragments.PostFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -37,4 +38,18 @@ public class PostActivity extends AppCompatActivity {
     public void onBack() {loadFragment(new PostFragment());
     }
 
+    public void showPostFragment(String noiDung, int maQuyenRiengTu) {
+        PostFragment postFragment = new PostFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("noidung", noiDung);
+        bundle.putInt("maquyenriengtu", maQuyenRiengTu);
+        postFragment.setArguments(bundle);
+
+        loadFragment(postFragment);
+    }
+
+    public void goToPost() {
+        loadFragment(new PostFragment());
+    }
 }

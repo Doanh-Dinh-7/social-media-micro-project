@@ -13,6 +13,7 @@ import com.example.social_app.MainActivity;
 import com.example.social_app.R;
 import com.example.social_app.model.LoginRequest;
 import com.example.social_app.model.LoginResponse;
+import com.example.social_app.model.NguoiDung;
 import com.example.social_app.network.ApiService;
 import com.example.social_app.network.RetrofitClient;
 import com.example.social_app.view.fragments.LoginFormFragment;
@@ -64,16 +65,27 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Kiểm tra nếu access_token tồn tại
-                        String accessToken = response.body().getAccessToken();
-                        if (accessToken != null && !accessToken.isEmpty()){
-                        getSharedPreferences("user_data", MODE_PRIVATE).edit().putString("auth_token", accessToken).apply();
+                    // Kiểm tra nếu access_token và user tồn tại
+                    String accessToken = response.body().getAccessToken();
+                    NguoiDung user = response.body().getUser();
+
+                    if (accessToken != null && !accessToken.isEmpty() && user != null) {
+                        // Lấy userId từ đối tượng NguoiDung
+                        int userId = user.getMaNguoiDung();
+
+                        // Lưu token và userId vào SharedPreferences
+                        getSharedPreferences("user_data", MODE_PRIVATE).edit()
+                                .putString("auth_token", accessToken)
+                                .putInt("user_id", userId)
+                                .apply();
+
+                        Log.d("DEBUG_LOGIN", "User ID nhận được: " + userId);
+
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         // Chuyển sang MainActivity
                         Intent intent = new Intent(LoginActivity.this, PostActivity.class);
                         startActivity(intent);
-                         // Đóng màn hình đăng nhập
-
+                        finish(); // Đóng màn hình đăng nhập
                     } else {
                         Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
                     }
@@ -89,7 +101,6 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                // In ra lỗi chi tiết
                 Log.e("LoginActivity", "Lỗi kết nối: " + t.getMessage());
                 Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
