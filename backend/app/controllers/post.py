@@ -107,9 +107,11 @@ class PostController:
         friend_ids.append(user_id)  # Thêm ID của người dùng hiện tại
         
         # Lấy bài viết từ người dùng và bạn bè
-        posts = db.query(BaiViet).filter(
-            BaiViet.MaNguoiDung.in_(friend_ids)
-        ).order_by(BaiViet.NgayTao.desc()).offset(skip).limit(limit).all()
+        # posts = db.query(BaiViet).filter(
+        #     BaiViet.MaNguoiDung.in_(friend_ids)
+        # ).order_by(BaiViet.NgayTao.desc()).offset(skip).limit(limit).all()
+        
+        posts = db.query(BaiViet).order_by(BaiViet.NgayTao.desc()).offset(skip).limit(limit).all()
         
         # Tạo response
         result = []
