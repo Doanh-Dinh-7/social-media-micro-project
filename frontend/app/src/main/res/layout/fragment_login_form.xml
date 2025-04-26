@@ -48,8 +48,8 @@
                 android:id="@+id/edtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="55dp"
-                android:hint="Email hoặc số điện thoại" />
+                android:hint="Email"
+                android:paddingStart="55dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout

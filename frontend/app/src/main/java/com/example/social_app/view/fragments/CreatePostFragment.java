@@ -1,13 +1,16 @@
 package com.example.social_app.view.fragments;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,26 +31,41 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.social_app.R;
+import com.example.social_app.model.CloudinaryUploadResult;
 import com.example.social_app.model.PostRequest;
 import com.example.social_app.model.PostResponse;
 import com.example.social_app.network.ApiService;
+import com.example.social_app.network.CloudinaryService;
 import com.example.social_app.network.RetrofitClient;
+import com.example.social_app.view.activities.LoginActivity;
 import com.example.social_app.view.activities.PostActivity;
 import com.example.social_app.view.adapters.ImageAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CreatePostFragment extends Fragment {
     private ImageButton btnClose;
@@ -100,10 +118,12 @@ public class CreatePostFragment extends Fragment {
 
         edtPostContent.addTextChangedListener(new android.text.TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(android.text.Editable s) {
@@ -139,7 +159,7 @@ public class CreatePostFragment extends Fragment {
                             selectedImageUris.add(uri);
                         }
 
-                        if (!selectedImageUris.isEmpty()|| imageAdapter.getCount() > 0) {
+                        if (!selectedImageUris.isEmpty() || imageAdapter.getCount() > 0) {
                             gridSelectedImages.setVisibility(View.VISIBLE);
                             imageAdapter.notifyDataSetChanged();
                         }
@@ -157,10 +177,10 @@ public class CreatePostFragment extends Fragment {
 
     private void updateButtonState() {
         boolean hasContent = !edtPostContent.getText().toString().trim().isEmpty();
-        boolean hasTopic = !selectedTopic.isEmpty();
         boolean hasObject = !selectedObject.isEmpty();
-        btnPost.setEnabled(hasContent && hasTopic && hasObject);
+        btnPost.setEnabled(hasContent && hasObject);
     }
+
     public void updateApplyButtonState() {
         boolean isAnyRadioChecked = rbPublic.isChecked() || rbFriends.isChecked() || rbOnlyMe.isChecked();
         boolean isCheckboxChecked = checkboxDefault.isChecked();
@@ -192,6 +212,7 @@ public class CreatePostFragment extends Fragment {
 
         bottomSheetDialog.show();
     }
+
     private void showObjectBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
         View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.layout_bottom_object, null);
@@ -244,110 +265,6 @@ public class CreatePostFragment extends Fragment {
 
         bottomSheetDialog.show();
     }
-
-    private void createPost() {
-        String noiDung = edtPostContent.getText().toString().trim();
-        if (noiDung.isEmpty()) {
-            Toast.makeText(getActivity(), "Vui lòng nhập nội dung bài viết", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Lấy thông tin chủ đề và quyền riêng tư
-        TextView txtTopic = btnTopic.findViewById(R.id.txtTopic);
-        TextView txtAudience = btnObject.findViewById(R.id.txtObject);
-        String ChuDe = txtTopic.getText().toString().replace(" ▼", "");
-        String QuyenRiengTu = txtAudience.getText().toString().replace(" ▼", "");
-
-        Integer maChuDe = getMaChuDe(ChuDe);
-        if (maChuDe == -1 ) {
-            maChuDe = null;
-        }
-        int maQuyenRiengTu = getMaQuyenRiengTu(QuyenRiengTu);
-        if (maQuyenRiengTu == -1 ) {
-            Toast.makeText(getActivity(), "Chưa chọn quyền riêng tư hợp lệ", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Kiểm tra nếu có ảnh và chuẩn bị phần ảnh
-        List<MultipartBody.Part> imageParts = prepareImageParts();
-        List<String> imageUrls = getImageUrlsFromUris();
-
-        // Tạo đối tượng PostRequest (chỉ bao gồm text và metadata)
-        PostRequest postRequest = new PostRequest(noiDung, maQuyenRiengTu, maChuDe, imageUrls);
-
-        // Lấy authToken từ SharedPreferences
-        SharedPreferences preferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
-        String authToken = preferences.getString("auth_token", "");
-
-        // Kiểm tra nếu token không hợp lệ
-        if (authToken.isEmpty()) {
-            Toast.makeText(getActivity(), "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Log.d("CreatePost", "noiDung: " + noiDung);
-        Log.d("CreatePost", "maChuDe: " + maChuDe);
-        Log.d("CreatePost", "maQuyenRiengTu: " + maQuyenRiengTu);
-        for (Uri uri : selectedImageUris) {
-            Log.d("CreatePost", "Image URI: " + uri.toString());
-        }
-
-        // Thêm token vào header của yêu cầu
-        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
-        Call<PostResponse> call = apiService.createPostWithImages("Bearer " + authToken, postRequest, imageParts);
-
-        // Gọi API để tạo bài viết
-        call.enqueue(new Callback<PostResponse>() {
-            @Override
-            public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getActivity(), "Bài viết đã được đăng thành công!", Toast.LENGTH_SHORT).show();
-                    // Chuyển hướng hoặc thực hiện hành động khác sau khi đăng thành công
-                } else {
-                    Toast.makeText(getActivity(), "Đăng bài thất bại!", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PostResponse> call, Throwable t) {
-                Toast.makeText(getActivity(), "Lỗi kết nối!", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private List<String> getImageUrlsFromUris() {
-        List<String> imageUrls = new ArrayList<>();
-        for (Uri uri : selectedImageUris) {
-            // Chuyển Uri thành URL ảnh
-            String imageUrl = uri.toString(); // Hoặc bạn có thể tải ảnh lên server trước rồi lấy URL
-            imageUrls.add(imageUrl);
-        }
-        return imageUrls;
-    }
-
-    private List<MultipartBody.Part> prepareImageParts() {
-        List<MultipartBody.Part> imageParts = new ArrayList<>();
-        for (Uri uri : selectedImageUris) {
-            // Lấy file từ Uri
-            File file = new File(getRealPathFromURI(uri));
-            RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
-            MultipartBody.Part part = MultipartBody.Part.createFormData("images", file.getName(), requestBody);
-            imageParts.add(part);
-        }
-        return imageParts;
-    }
-
-    private String getRealPathFromURI(Uri uri) {
-        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-        if (cursor == null) return uri.getPath();
-        cursor.moveToFirst();
-        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-        String path = cursor.getString(idx);
-        cursor.close();
-        return path;
-    }
-
-
-
     private int getMaChuDe(String ChuDe){
         switch (ChuDe) {
             case "Kinh nghiệm":
@@ -371,44 +288,148 @@ public class CreatePostFragment extends Fragment {
                 return -1;
         }
     }
+
+    private void createPost() {
+        String noiDung = edtPostContent.getText().toString().trim();
+        if (noiDung.isEmpty()) {
+            Toast.makeText(getContext(), "Vui lòng nhập nội dung bài viết", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String chuDe = ((TextView) btnTopic.getChildAt(0)).getText().toString().replace(" ▼", "");
+        String quyenRiengTu = ((TextView) btnObject.getChildAt(0)).getText().toString().replace(" ▼", "");
+
+        int maChuDe = getMaChuDe(chuDe);
+        if (maChuDe == -1) {
+            Toast.makeText(getContext(), "Chưa chọn chủ đề hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int maQuyenRiengTu = getMaQuyenRiengTu(quyenRiengTu);
+        if (maQuyenRiengTu == -1) {
+            Toast.makeText(getContext(), "Chưa chọn quyền riêng tư hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        SharedPreferences preferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        String authToken = preferences.getString("auth_token", "");
+
+        if (authToken.isEmpty()) {
+            Toast.makeText(getContext(), "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Gửi request lên server
+        sendPostToServer(authToken, noiDung, maQuyenRiengTu, maChuDe);
+    }
+
+    private void sendPostToServer(String authToken, String noiDung, int maQuyenRiengTu, Integer maChuDe) {
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+
+        // Các phần text
+        RequestBody noiDungBody = RequestBody.create(MediaType.parse("text/plain"), noiDung);
+        RequestBody quyenBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(maQuyenRiengTu));
+        RequestBody chuDeBody = RequestBody.create(MediaType.parse("text/plain"), maChuDe != null ? String.valueOf(maChuDe) : "");
+
+        // Ảnh (multipart)
+        List<MultipartBody.Part> imageParts = new ArrayList<>();
+        if (selectedImageUris != null) {
+            for (Uri uri : selectedImageUris) {
+                try {
+                    File resizedImage = resizeImage(uri); // ✅ resize ảnh trước khi gửi
+                    RequestBody fileBody = RequestBody.create(MediaType.parse("image/*"), resizedImage);
+                    MultipartBody.Part part = MultipartBody.Part.createFormData("images", resizedImage.getName(), fileBody);
+                    imageParts.add(part);
+                } catch (IOException e) {
+                    Log.e("CreatePost", "Lỗi xử lý ảnh: " + e.getMessage());
+                }
+            }
+        }
+
+        Call<PostResponse> call = apiService.createPost(
+                "Bearer " + authToken,
+                noiDungBody,
+                quyenBody,
+                chuDeBody,
+                imageParts
+        );
+
+        call.enqueue(new Callback<PostResponse>() {
+            @Override
+            public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getActivity(), "Đăng bài thành công", Toast.LENGTH_SHORT).show();
+                    // TODO: Chuyển màn hoặc làm gì tiếp
+                    // Chuyển sang PostFragment và truyền dữ liệu bài viết mới
+
+//                    PostResponse createdPost = response.body();
+//
+//
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable("new_post", createdPost); // PostResponse phải implement Serializable
+//
+//                    PostFragment postFragment = new PostFragment();
+//                    postFragment.setArguments(bundle);
+
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new PostFragment())
+                            .commit();
+
+
+                } else {
+                    Toast.makeText(getActivity(), "Đăng bài thất bại: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostResponse> call, Throwable t) {
+                Toast.makeText(getActivity(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private File resizeImage(Uri imageUri) throws IOException {
+        // Bước 1: Đọc bitmap gốc từ URI
+        Bitmap originalBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
+
+        // Bước 2: Resize ảnh
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 800, 800, true);
+
+        // Bước 3: Lưu bitmap đã resize vào file tạm
+        File file = new File(getActivity().getCacheDir(), getFileName(imageUri));
+        FileOutputStream out = new FileOutputStream(file);
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out); // nén ảnh xuống 80% chất lượng
+        out.flush();
+        out.close();
+
+        return file;
+    }
+
+    private String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme() != null && uri.getScheme().equals("content")) {
+            Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        int nameIndex = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME);
+                        result = cursor.getString(nameIndex);
+                    }
+                } finally {
+                    cursor.close();
+                }
+            }
+        }
+
+        if (result == null) {
+            String path = uri.getPath();
+            int cut = path != null ? path.lastIndexOf('/') : -1;
+            if (cut != -1) {
+                result = path.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
+
 }
-//    private List<String> getImageUrlsFromUris() {
-//        List<String> imageUrls = new ArrayList<>();
-//        for (Uri uri : selectedImageUris) {
-//            // Chuyển Uri thành URL ảnh
-//            String imageUrl = uri.toString(); // Hoặc bạn có thể tải ảnh lên server trước rồi lấy URL
-//            imageUrls.add(imageUrl);
-////            imageUrls.add("https://file.hstatic.net/200000709287/article/da_nang_ec42ae7a1fcf45159c8f78b5bd403d33_1024x1024.png");
-//        }
-//        return imageUrls;
-//    }
-//
-//
-//
-//    private List<MultipartBody.Part> prepareImageParts() {
-//        List<MultipartBody.Part> imageParts = new ArrayList<>();
-//        for (Uri uri : selectedImageUris) {
-//            // Lấy file từ Uri
-//            File file = new File(getRealPathFromURI(uri));
-//            RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
-//            MultipartBody.Part part = MultipartBody.Part.createFormData("images", file.getName(), requestBody);
-//            imageParts.add(part);
-//        }
-//        return imageParts;
-//    }
-//
-//
-//    private String getRealPathFromURI(Uri uri) {
-//        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
-//        if (cursor == null) return uri.getPath();
-//        cursor.moveToFirst();
-//        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-//        String path = cursor.getString(idx);
-//        cursor.close();
-//        return path;
-//    }
-//
-//
-//}
-//
-//

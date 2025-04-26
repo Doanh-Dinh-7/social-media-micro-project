@@ -1,12 +1,19 @@
 package com.example.social_app.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class HinhAnh {
+
+    @SerializedName("MaHinhAnh")
     private int maHinhAnh;
+
+    @SerializedName("MaBaiDang")
     private int maBaiDang;
+
+    @SerializedName("Url")
     private String url;
 
-    public HinhAnh() {
-    }
+    public HinhAnh() {}
 
     public HinhAnh(int maHinhAnh, int maBaiDang, String url) {
         this.maHinhAnh = maHinhAnh;
