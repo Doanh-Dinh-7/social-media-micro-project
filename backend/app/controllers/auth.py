@@ -108,3 +108,24 @@ class AuthController:
                 detail="Invalid refresh token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+
+    @staticmethod
+    async def update_name(user_id: int, ten_nguoi_dung: str, db: Session):
+        try:
+            # Tìm người dùng theo ID
+            user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == user_id).first()
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Người dùng không tồn tại"
+                )
+            
+            # Cập nhật tên người dùng
+            user.TenNguoiDung = ten_nguoi_dung
+            db.commit()
+            db.refresh(user)
+            
+            return UserResponse.from_orm(user)
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=500, detail=str(e))

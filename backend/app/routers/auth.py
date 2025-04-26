@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
 from app.config.database import get_db
-from app.schemas.user import UserCreate, UserLogin, TokenResponse
+from app.schemas.user import UserCreate, UserLogin, TokenResponse, UserResponse
 from app.controllers.auth import AuthController
+from app.utils.security import get_current_active_user
 
 router = APIRouter(
     prefix="/auth",
@@ -37,3 +38,14 @@ async def refresh_token(refresh_token: str = Body(..., embed=True), db: Session 
     Làm mới access token bằng refresh token
     """
     return await AuthController.refresh_token(refresh_token, db)
+
+@router.put("/register/update-name", response_model=UserResponse)
+async def update_name(
+    ten_nguoi_dung: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    """
+    Cập nhật tên người dùng
+    """
+    return await AuthController.update_name(current_user["nguoi_dung"].MaNguoiDung, ten_nguoi_dung, db)

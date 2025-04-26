@@ -5,7 +5,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from app.config.settings import settings
 from app.config.database import engine, Base
-from app.routers import auth, user, post  # Thêm router post
+from app.routers import auth, user, post, friendship, message
 from app.middleware.auth import auth_middleware
 import os
 
@@ -41,7 +41,9 @@ app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_FOLDER), name="uploa
 # Đăng ký các router
 app.include_router(auth.router, prefix=settings.API_PREFIX)
 app.include_router(user.router, prefix=settings.API_PREFIX)
-app.include_router(post.router, prefix=settings.API_PREFIX)  # Thêm router post
+app.include_router(post.router, prefix=settings.API_PREFIX) 
+app.include_router(friendship.router, prefix=settings.API_PREFIX)
+app.include_router(message.router, prefix=settings.API_PREFIX)
 
 @app.get("/")
 async def root():
@@ -61,7 +63,7 @@ async def custom_swagger_ui_html():
             "docExpansion": "none",
             "defaultModelsExpandDepth": -1,
             "defaultModelExpandDepth": 3,
-            "defaultModelRendering": "model",
+            "defaultModelRendering": "example",
             "displayOperationId": False,
             "filter": True,
             "showExtensions": True,
