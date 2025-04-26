@@ -5,6 +5,7 @@ from app.models.friendship import LoiMoiKetBan, BanBe
 from app.models.user import NguoiDung
 from app.schemas.friendship import FriendRequestCreate, FriendRequestUpdate
 from typing import List
+from app.controllers.notification import NotificationController
 
 class FriendshipController:
     @staticmethod
@@ -37,6 +38,11 @@ class FriendshipController:
         db.add(friend_request)
         db.commit()
         db.refresh(friend_request)
+        # Tạo thông báo cho người nhận
+        current_user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == current_user_id).first()
+        noi_dung_tb = f"{current_user.TenNguoiDung} đã gửi cho bạn một lời mời kết bạn."
+        import asyncio
+        asyncio.create_task(NotificationController.create_notification(request.NguoiNhan, noi_dung_tb, db))
         return friend_request
 
     @staticmethod

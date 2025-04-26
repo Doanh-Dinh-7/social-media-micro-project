@@ -10,6 +10,8 @@ from datetime import datetime
 from app.config.settings import settings
 from app.utils.cloudinary import upload_image
 import cloudinary
+from app.controllers.notification import NotificationController
+from app.models.user import NguoiDung
 
 class PostController:
     @staticmethod
@@ -233,6 +235,13 @@ class CommentController:
         bl_dict = CommentResponse.from_orm(db_binh_luan).dict()
         bl_dict["TenNguoiDung"] = db_binh_luan.nguoi_dung.TenNguoiDung
         
+        # Tạo thông báo cho chủ bài viết nếu không phải tự mình bình luận
+        if bai_viet.MaNguoiDung != ma_nguoi_dung:
+            user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == ma_nguoi_dung).first()
+            noi_dung_tb = f"{user.TenNguoiDung} đã bình luận về bài viết của bạn: '{binh_luan.NoiDung}'"
+            import asyncio
+            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db))
+
         return bl_dict
     
     @staticmethod
@@ -295,6 +304,13 @@ class LikeController:
         lt_dict = LikeResponse.from_orm(db_luot_thich).dict()
         lt_dict["TenNguoiDung"] = db_luot_thich.nguoi_dung.TenNguoiDung
         
+        # Tạo thông báo cho chủ bài viết nếu không phải tự mình like
+        if bai_viet.MaNguoiDung != ma_nguoi_dung:
+            user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == ma_nguoi_dung).first()
+            noi_dung_tb = f"{user.TenNguoiDung} đã thích bài viết của bạn."
+            import asyncio
+            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db))
+
         return lt_dict
 
     @staticmethod
