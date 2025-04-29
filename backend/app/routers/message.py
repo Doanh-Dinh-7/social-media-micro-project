@@ -23,6 +23,18 @@ async def send_message(
     '''
     return await MessageController.send_message(current_user["nguoi_dung"].MaNguoiDung, data, db)
 
+@router.get("/conversations", response_model=List[Any])
+async def get_conversations(
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    '''
+    Lấy danh sách hộp tin nhắn (conversation list)
+    '''
+    return await MessageController.get_conversations(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db) 
+
 @router.get("/{user_id}", response_model=List[MessageResponse])
 async def get_messages(
     user_id: int,
@@ -36,14 +48,3 @@ async def get_messages(
     '''
     return await MessageController.get_messages(current_user["nguoi_dung"].MaNguoiDung, user_id, skip, limit, db)
 
-@router.get("/conversations", response_model=List[Any])
-async def get_conversations(
-    skip: int = 0,
-    limit: int = 20,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_active_user)
-):
-    '''
-    Lấy danh sách hộp tin nhắn (conversation list)
-    '''
-    return await MessageController.get_conversations(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db) 
