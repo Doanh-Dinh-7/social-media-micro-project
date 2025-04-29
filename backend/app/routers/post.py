@@ -112,7 +112,8 @@ def get_binh_luan_by_bai_viet(
     ma_bai_viet: int,
     skip: int = 0,
     limit: int = 10,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     """
     Lấy danh sách bình luận của một bài viết
@@ -120,7 +121,7 @@ def get_binh_luan_by_bai_viet(
     return CommentController.get_binh_luan_by_bai_viet(db, ma_bai_viet, skip, limit)
 
 @router.post("/{ma_bai_viet}/binh-luan", response_model=CommentResponse)
-def create_binh_luan(
+async def create_binh_luan(
     ma_bai_viet: int,
     binh_luan: CommentCreate,
     db: Session = Depends(get_db),
@@ -129,7 +130,7 @@ def create_binh_luan(
     """
     Tạo bình luận cho bài viết
     """
-    return CommentController.create_binh_luan(db, binh_luan, current_user["nguoi_dung"].MaNguoiDung)
+    return await CommentController.create_binh_luan(db, binh_luan, current_user["nguoi_dung"].MaNguoiDung)
 
 @router.delete("/{ma_bai_viet}/binh-luan/{ma_binh_luan}")
 def delete_binh_luan(
@@ -150,7 +151,8 @@ def get_luot_thich_by_bai_viet(
     ma_bai_viet: int,
     skip: int = 0,
     limit: int = 10,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
     """
     Lấy danh sách lượt thích của một bài viết
@@ -158,7 +160,7 @@ def get_luot_thich_by_bai_viet(
     return LikeController.get_luot_thich_by_bai_viet(db, ma_bai_viet, skip, limit)
 
 @router.post("/{ma_bai_viet}/luot-thich", response_model=LikeResponse)
-def create_luot_thich(
+async def create_luot_thich(
     ma_bai_viet: int,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -166,7 +168,7 @@ def create_luot_thich(
     """
     Thêm lượt thích cho bài viết
     """
-    return LikeController.create_luot_thich(db, ma_bai_viet, current_user["nguoi_dung"].MaNguoiDung)
+    return await LikeController.create_luot_thich(db, ma_bai_viet, current_user["nguoi_dung"].MaNguoiDung)
 
 @router.delete("/{ma_bai_viet}/luot-thich")
 def delete_luot_thich(

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, SmallInteger
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, SmallInteger, UnicodeText
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.config.database import Base
@@ -8,7 +8,7 @@ class NguoiDung(Base):
     __tablename__ = "NguoiDung"
     
     MaNguoiDung = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    TenNguoiDung = Column(String(255), nullable=False)
+    TenNguoiDung = Column(UnicodeText, nullable=False)
     NgayTao = Column(DateTime, nullable=False, default=datetime.now)
     
     # Relationships

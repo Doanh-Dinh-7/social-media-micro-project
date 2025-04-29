@@ -45,4 +45,16 @@ async def get_friends(
     '''
     Lấy danh sách bạn bè
     '''
-    return await FriendshipController.get_friends(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db) 
+    return await FriendshipController.get_friends(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db)
+
+@router.get("/requests/", response_model=List[FriendRequestResponse])
+async def get_friend_requests(
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    '''
+    Lấy danh sách lời mời kết bạn nhận được
+    '''
+    return await FriendshipController.get_friend_requests(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db) 

@@ -215,7 +215,7 @@ class CommentController:
         return result
 
     @staticmethod
-    def create_binh_luan(db: Session, binh_luan: CommentCreate, ma_nguoi_dung: int):
+    async def create_binh_luan(db: Session, binh_luan: CommentCreate, ma_nguoi_dung: int):
         # Kiểm tra bài viết có tồn tại không
         bai_viet = db.query(BaiViet).filter(BaiViet.MaBaiViet == binh_luan.MaBaiViet).first()
         if not bai_viet:
@@ -230,17 +230,18 @@ class CommentController:
         db.add(db_binh_luan)
         db.commit()
         db.refresh(db_binh_luan)
-        
+
         # Lấy thông tin người dùng
         bl_dict = CommentResponse.from_orm(db_binh_luan).dict()
         bl_dict["TenNguoiDung"] = db_binh_luan.nguoi_dung.TenNguoiDung
-        
-        # Tạo thông báo cho chủ bài viết nếu không phải tự mình bình luận
+
+        # Chỉ tạo thông báo nếu người bình luận KHÁC chủ bài viết
         if bai_viet.MaNguoiDung != ma_nguoi_dung:
             user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == ma_nguoi_dung).first()
             noi_dung_tb = f"{user.TenNguoiDung} đã bình luận về bài viết của bạn: '{binh_luan.NoiDung}'"
             import asyncio
             asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db))
+            # await NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db)
 
         return bl_dict
     
@@ -276,7 +277,7 @@ class LikeController:
         return result
 
     @staticmethod
-    def create_luot_thich(db: Session, ma_bai_viet: int, ma_nguoi_dung: int):
+    async def create_luot_thich(db: Session, ma_bai_viet: int, ma_nguoi_dung: int):
         # Kiểm tra bài viết có tồn tại không
         bai_viet = db.query(BaiViet).filter(BaiViet.MaBaiViet == ma_bai_viet).first()
         if not bai_viet:
@@ -287,7 +288,6 @@ class LikeController:
             LuotThich.MaBaiViet == ma_bai_viet,
             LuotThich.MaNguoiDung == ma_nguoi_dung
         ).first()
-        
         if existing_like:
             raise HTTPException(status_code=400, detail="Bạn đã thích bài viết này")
 
@@ -299,15 +299,16 @@ class LikeController:
         db.add(db_luot_thich)
         db.commit()
         db.refresh(db_luot_thich)
-        
+
         # Lấy thông tin người dùng
         lt_dict = LikeResponse.from_orm(db_luot_thich).dict()
         lt_dict["TenNguoiDung"] = db_luot_thich.nguoi_dung.TenNguoiDung
-        
-        # Tạo thông báo cho chủ bài viết nếu không phải tự mình like
+
+        # Chỉ tạo thông báo nếu người thích KHÁC chủ bài viết
         if bai_viet.MaNguoiDung != ma_nguoi_dung:
             user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == ma_nguoi_dung).first()
             noi_dung_tb = f"{user.TenNguoiDung} đã thích bài viết của bạn."
+            # await NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db)
             import asyncio
             asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db))
 

@@ -4,6 +4,7 @@ from sqlalchemy import or_, and_
 from app.models.friendship import LoiMoiKetBan, BanBe
 from app.models.user import NguoiDung
 from app.schemas.friendship import FriendRequestCreate, FriendRequestUpdate
+from app.schemas.user import UserResponse
 from typing import List
 from app.controllers.notification import NotificationController
 
@@ -38,11 +39,6 @@ class FriendshipController:
         db.add(friend_request)
         db.commit()
         db.refresh(friend_request)
-        # Tạo thông báo cho người nhận
-        current_user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == current_user_id).first()
-        noi_dung_tb = f"{current_user.TenNguoiDung} đã gửi cho bạn một lời mời kết bạn."
-        import asyncio
-        asyncio.create_task(NotificationController.create_notification(request.NguoiNhan, noi_dung_tb, db))
         return friend_request
 
     @staticmethod
@@ -67,4 +63,22 @@ class FriendshipController:
     @staticmethod
     async def get_friends(current_user_id: int, skip: int, limit: int, db: Session):
         friends = db.query(BanBe).filter(BanBe.MaNguoiDung == current_user_id).order_by(BanBe.NgayTao.desc()).offset(skip).limit(limit).all()
-        return friends 
+        result = []
+        for f in friends:
+            ban_obj = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == f.MaBanBe).first()
+            friend_schema = {
+                "MaNguoiDung": f.MaNguoiDung,
+                "MaBanBe": f.MaBanBe,
+                "NgayTao": f.NgayTao,
+                "ban": UserResponse.from_orm(ban_obj) if ban_obj else None
+            }
+            result.append(friend_schema)
+        return result
+
+    @staticmethod
+    async def get_friend_requests(current_user_id: int, skip: int, limit: int, db: Session):
+        requests = db.query(LoiMoiKetBan).filter(
+            LoiMoiKetBan.NguoiNhan == current_user_id,
+            LoiMoiKetBan.TrangThai == 0
+        ).order_by(LoiMoiKetBan.ThoiGian.desc()).offset(skip).limit(limit).all()
+        return requests 

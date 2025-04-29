@@ -31,6 +31,7 @@ async def auth_middleware(request: Request, call_next):
         # Lấy token từ header
         auth_header = request.headers.get("Authorization")
         if not auth_header:
+            print("[AUTH] Không có header Authorization")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Missing Authorization header",
@@ -39,6 +40,7 @@ async def auth_middleware(request: Request, call_next):
         
         # Kiểm tra định dạng token
         if not auth_header.startswith("Bearer "):
+            print(f"[AUTH] Sai định dạng token: {auth_header}")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token format",
@@ -47,18 +49,28 @@ async def auth_middleware(request: Request, call_next):
         
         # Lấy token
         token = auth_header.split(" ")[1]
-        
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        except Exception as e:
+            print(f"[AUTH] Lỗi giải mã token: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token decode",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
         email = payload.get("sub")
         if not email:
+            print(f"[AUTH] Token không có trường sub: {payload}")
             raise HTTPException(status_code=401, detail="Invalid token payload")
 
         db: Session = next(get_db())
         tai_khoan = db.query(TaiKhoan).filter(TaiKhoan.Email == email).first()
         if not tai_khoan:
+            print(f"[AUTH] Không tìm thấy user với email: {email}")
             raise HTTPException(status_code=401, detail="User not found")
 
         if tai_khoan.TrangThai == 0:
+            print(f"[AUTH] Tài khoản bị khóa: {email}")
             raise HTTPException(status_code=403, detail="Account is disabled")
 
         nguoi_dung = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == tai_khoan.MaNguoiDung).first()
@@ -71,9 +83,10 @@ async def auth_middleware(request: Request, call_next):
         return await call_next(request)
         
     except HTTPException as e:
+        print(f"[AUTH] HTTPException: {e.detail}")
         raise e
     except Exception as e:
-        print(e)
+        print(f"[AUTH] Exception: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",

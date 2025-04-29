@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, SmallInteger
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UnicodeText
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.config.database import Base
@@ -30,7 +30,7 @@ class BaiViet(Base):
     MaChuDe = Column(Integer, ForeignKey("ChuDe.MaChuDe"))
     NgayTao = Column(DateTime, nullable=False, default=datetime.now)
     NgayCapNhat = Column(DateTime, nullable=True)
-    NoiDung = Column(Text, nullable=False)
+    NoiDung = Column(UnicodeText, nullable=False)
     
     # Relationships
     nguoi_dung = relationship("NguoiDung", back_populates="bai_viet")
@@ -47,7 +47,7 @@ class BinhLuan(Base):
     MaBaiViet = Column(Integer, ForeignKey("BaiViet.MaBaiViet"))
     MaNguoiDung = Column(Integer, ForeignKey("NguoiDung.MaNguoiDung"))
     NgayTao = Column(DateTime, nullable=False, default=datetime.now)
-    NoiDung = Column(Text, nullable=False)
+    NoiDung = Column(UnicodeText, nullable=False)
     
     # Relationships
     bai_viet = relationship("BaiViet", back_populates="binh_luan")
