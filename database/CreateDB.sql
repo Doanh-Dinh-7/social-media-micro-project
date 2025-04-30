@@ -160,3 +160,7 @@ INSERT INTO QuyenRiengTu (Loai) VALUES (N'Công khai'), (N'Bạn bè'), (N'Riên
 INSERT INTO ChuDe (Loai) VALUES (N'Kinh nghiệm'), (N'Chia sẻ'), (N'Hỏi đáp'), (N'Giải trí');
 
 GO
+
+ALTER TABLE NguoiDung
+ADD AvatarUrl NVARCHAR(500),
+    AnhBiaUrl NVARCHAR(500);
