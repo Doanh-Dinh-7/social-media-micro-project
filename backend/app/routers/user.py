@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Depends, HTTPException, status, Body, UploadFile, File
 from sqlalchemy.orm import Session
 from app.config.database import get_db
 from app.schemas.user import UserProfileResponse, UserResponse
@@ -48,3 +48,29 @@ async def update_profile(
         ten_nguoi_dung, 
         db
     )
+
+@router.put("/avatar", response_model=UserResponse)
+async def update_avatar(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    '''
+    Cập nhật ảnh đại diện (avatar) lên Cloudinary
+    '''
+    file_bytes = await file.read()
+    user = await UserController.update_avatar(current_user["nguoi_dung"].MaNguoiDung, file_bytes, file.filename, db)
+    return UserResponse.from_orm(user)
+
+@router.put("/cover", response_model=UserResponse)
+async def update_cover(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    '''
+    Cập nhật ảnh bìa (cover) lên Cloudinary
+    '''
+    file_bytes = await file.read()
+    user = await UserController.update_cover(current_user["nguoi_dung"].MaNguoiDung, file_bytes, file.filename, db)
+    return UserResponse.from_orm(user)

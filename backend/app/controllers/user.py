@@ -1,10 +1,11 @@
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, UploadFile
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
 from app.models.user import NguoiDung, TaiKhoan
 from app.models.friendship import LoiMoiKetBan
 from app.schemas.user import UserProfileResponse, UserResponse
 from typing import List
+from app.utils.cloudinary import upload_image
 
 class UserController:
     @staticmethod
@@ -35,7 +36,9 @@ class UserController:
             NgayTao=user.NgayTao,
             Email=account.Email,
             TrangThai=account.TrangThai,
-            TheoDoi=pending_requests_count
+            TheoDoi=pending_requests_count,
+            AnhDaiDien=user.AnhDaiDien,
+            AnhBia=user.AnhBia
         )
         
         return response
@@ -66,3 +69,29 @@ class UserController:
         db.refresh(user)
         
         return UserResponse.from_orm(user)
+
+    @staticmethod
+    async def update_avatar(current_user_id: int, file: bytes, filename: str, db: Session):
+        # Upload lên Cloudinary
+        result = await upload_image(file, folder="avatar")
+        url = result['secure_url']
+        user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == current_user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="Không tìm thấy người dùng.")
+        user.AnhDaiDien = url
+        db.commit()
+        db.refresh(user)
+        return user
+
+    @staticmethod
+    async def update_cover(current_user_id: int, file: bytes, filename: str, db: Session):
+        # Upload lên Cloudinary
+        result = await upload_image(file, folder="cover")
+        url = result['secure_url']
+        user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == current_user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="Không tìm thấy người dùng.")
+        user.AnhBia = url
+        db.commit()
+        db.refresh(user)
+        return user

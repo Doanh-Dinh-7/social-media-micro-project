@@ -10,6 +10,8 @@ class NguoiDung(Base):
     MaNguoiDung = Column(Integer, primary_key=True, index=True, autoincrement=True)
     TenNguoiDung = Column(UnicodeText, nullable=False)
     NgayTao = Column(DateTime, nullable=False, default=datetime.now)
+    AnhDaiDien = Column(String(255), nullable=True)  # Đường dẫn avatar
+    AnhBia = Column(String(255), nullable=True)      # Đường dẫn ảnh bìa
     
     # Relationships
     tai_khoan = relationship("TaiKhoan", back_populates="nguoi_dung", uselist=False)
