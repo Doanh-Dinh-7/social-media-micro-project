@@ -5,7 +5,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from app.config.settings import settings
 from app.config.database import engine, Base
-from app.routers import auth, user, post, friendship, message, notification
+from app.routers import auth, user, post, friendship, message, notification, friend_suggestion
 from app.middleware.auth import auth_middleware
 import os
 
@@ -45,6 +45,7 @@ app.include_router(post.router, prefix=settings.API_PREFIX)
 app.include_router(friendship.router, prefix=settings.API_PREFIX)
 app.include_router(message.router, prefix=settings.API_PREFIX)
 app.include_router(notification.router, prefix=settings.API_PREFIX)
+app.include_router(friend_suggestion.router, prefix=settings.API_PREFIX)
 
 @app.get("/")
 async def root():

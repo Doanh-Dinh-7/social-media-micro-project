@@ -35,6 +35,19 @@ async def get_conversations(
     '''
     return await MessageController.get_conversations(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db) 
 
+@router.get("/conversations/search", response_model=List[Any])
+async def search_conversations(
+    keyword: str,
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    '''
+    Tìm kiếm cuộc trò chuyện theo tên người dùng
+    '''
+    return await MessageController.search_conversations(current_user["nguoi_dung"].MaNguoiDung, keyword, skip, limit, db)
+
 @router.get("/{user_id}", response_model=List[MessageResponse])
 async def get_messages(
     user_id: int,

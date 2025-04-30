@@ -78,4 +78,29 @@ class MessageController:
                 "noi_dung_cuoi": last_msg.NoiDung if last_msg else None,
                 "thoi_gian_cuoi": last_msg.NgayGui if last_msg else None
             })
-        return result 
+        return result
+
+    @staticmethod
+    async def search_conversations(current_user_id: int, keyword: str, skip: int, limit: int, db: Session):
+        # Lấy tất cả cuộc trò chuyện của user hiện tại
+        conversations = db.query(CuocTroChuyen).filter(
+            or_(CuocTroChuyen.NguoiDung_1 == current_user_id, CuocTroChuyen.NguoiDung_2 == current_user_id)
+        ).order_by(desc(CuocTroChuyen.TinNhanCuoi)).all()
+        result = []
+        for conv in conversations:
+            # Xác định người còn lại
+            other_id = conv.NguoiDung_2 if conv.NguoiDung_1 == current_user_id else conv.NguoiDung_1
+            user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == other_id).first()
+            if not user or keyword.lower() not in user.TenNguoiDung.lower():
+                continue
+            last_msg = db.query(TinNhan).filter(TinNhan.MaTinNhan == conv.TinNhanCuoi).first()
+            result.append({
+                "MaCuocTroChuyen": conv.MaCuocTroChuyen,
+                "user_id": user.MaNguoiDung if user else None,
+                "ten_nguoi_dung": user.TenNguoiDung if user else None,
+                "anh_dai_dien": getattr(user, "AnhDaiDien", None),
+                "noi_dung_cuoi": last_msg.NoiDung if last_msg else None,
+                "thoi_gian_cuoi": last_msg.NgayGui if last_msg else None
+            })
+        # Phân trang kết quả
+        return result[skip:skip+limit] 

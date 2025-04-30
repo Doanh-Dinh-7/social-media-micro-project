@@ -32,6 +32,7 @@ class UserResponse(UserBase):
 class UserProfileResponse(UserResponse):
     Email: EmailStr
     TrangThai: int
+    TheoDoi: int = 0  # Số lượng người dùng đã gửi lời mời kết bạn chưa được chấp nhận
     
     class Config:
         from_attributes  = True

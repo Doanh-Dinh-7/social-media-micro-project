@@ -1,12 +1,14 @@
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import and_, func
 from app.models.user import NguoiDung, TaiKhoan
+from app.models.friendship import LoiMoiKetBan
 from app.schemas.user import UserProfileResponse, UserResponse
 from typing import List
 
 class UserController:
     @staticmethod
-    async def get_user_profile(user_id: int, db: Session):
+    async def get_user_profile(user_id: int, current_user_id: int, db: Session):
         # Tìm người dùng theo ID
         user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == user_id).first()
         if not user:
@@ -18,13 +20,22 @@ class UserController:
         # Lấy thông tin tài khoản
         account = db.query(TaiKhoan).filter(TaiKhoan.MaNguoiDung == user.MaNguoiDung).first()
         
+        # Đếm số lượng lời mời kết bạn chưa được chấp nhận gửi đến user này
+        pending_requests_count = db.query(func.count(LoiMoiKetBan.MaLoiMoi)).filter(
+            and_(
+                LoiMoiKetBan.NguoiNhan == user_id,
+                LoiMoiKetBan.TrangThai == 0
+            )
+        ).scalar()
+        
         # Tạo response
         response = UserProfileResponse(
             MaNguoiDung=user.MaNguoiDung,
             TenNguoiDung=user.TenNguoiDung,
             NgayTao=user.NgayTao,
             Email=account.Email,
-            TrangThai=account.TrangThai
+            TrangThai=account.TrangThai,
+            TheoDoi=pending_requests_count
         )
         
         return response

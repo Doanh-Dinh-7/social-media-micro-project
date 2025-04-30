@@ -21,7 +21,7 @@ async def get_user_profile(
     """
     Lấy thông tin profile của người dùng
     """
-    return await UserController.get_user_profile(user_id, db)
+    return await UserController.get_user_profile(user_id, current_user["nguoi_dung"].MaNguoiDung, db)
 
 @router.get("/search", response_model=List[UserResponse])
 async def search_users(
