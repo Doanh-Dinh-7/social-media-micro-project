@@ -55,7 +55,8 @@ class MessageController:
         ).first()
         if not conversation:
             return []
-        messages = db.query(TinNhan).filter(TinNhan.MaCuocTroChuyen == conversation.MaCuocTroChuyen).order_by(TinNhan.NgayGui.desc()).offset(skip).limit(limit).all()
+        # messages = db.query(TinNhan).filter(TinNhan.MaCuocTroChuyen == conversation.MaCuocTroChuyen).order_by(TinNhan.NgayGui.desc()).offset(skip).limit(limit).all()
+        messages = db.query(TinNhan).filter(TinNhan.MaCuocTroChuyen == conversation.MaCuocTroChuyen).order_by(TinNhan.NgayGui.asc()).offset(skip).limit(limit).all()
         return messages
 
     @staticmethod

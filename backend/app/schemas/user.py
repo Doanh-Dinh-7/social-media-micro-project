@@ -25,8 +25,8 @@ class UserLogin(BaseModel):
 class UserResponse(UserBase):
     MaNguoiDung: int
     NgayTao: datetime
-    AnhDaiDien: str = None
-    AnhBia: str = None
+    AnhDaiDien: Optional[str] = None
+    AnhBia: Optional[str] = None
     
     class Config:
         from_attributes  = True

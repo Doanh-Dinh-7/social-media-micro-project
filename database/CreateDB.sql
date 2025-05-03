@@ -162,5 +162,5 @@ INSERT INTO ChuDe (Loai) VALUES (N'Kinh nghiệm'), (N'Chia sẻ'), (N'Hỏi đ�
 GO
 
 ALTER TABLE NguoiDung
-ADD AvatarUrl NVARCHAR(500),
-    AnhBiaUrl NVARCHAR(500);
+ADD AnhDaiDien NVARCHAR(500),
+    AnhBia NVARCHAR(500);

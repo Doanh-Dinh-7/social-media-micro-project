@@ -201,17 +201,19 @@ class PostController:
 class CommentController:
     @staticmethod
     def get_binh_luan_by_bai_viet(db: Session, ma_bai_viet: int, skip: int = 0, limit: int = 10):
-        binh_luan = db.query(BinhLuan).filter(BinhLuan.MaBaiViet == ma_bai_viet)\
-            .order_by(desc(BinhLuan.NgayTao))\
-            .offset(skip).limit(limit).all()
-        
-        # Lấy thông tin người dùng cho mỗi bình luận
+        binh_luans = db.query(BinhLuan).filter(BinhLuan.MaBaiViet == ma_bai_viet).order_by(BinhLuan.NgayTao.asc()).offset(skip).limit(limit).all()
         result = []
-        for bl in binh_luan:
-            bl_dict = CommentResponse.from_orm(bl).dict()
-            bl_dict["TenNguoiDung"] = bl.nguoi_dung.TenNguoiDung
-            result.append(bl_dict)
-        
+        for bl in binh_luans:
+            user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == bl.MaNguoiDung).first()
+            result.append({
+                "MaBinhLuan": bl.MaBinhLuan,
+                "MaBaiViet": bl.MaBaiViet,
+                "MaNguoiDung": bl.MaNguoiDung,
+                "NoiDung": bl.NoiDung,
+                "NgayTao": bl.NgayTao,
+                "TenNguoiDung": user.TenNguoiDung if user else None,
+                "AnhDaiDien": user.AnhDaiDien if user else None
+            })
         return result
 
     @staticmethod

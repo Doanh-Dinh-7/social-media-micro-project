@@ -57,4 +57,15 @@ async def get_friend_requests(
     '''
     Lấy danh sách lời mời kết bạn nhận được
     '''
-    return await FriendshipController.get_friend_requests(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db) 
+    return await FriendshipController.get_friend_requests(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db)
+
+@router.delete("/unfriend/{friend_id}")
+async def unfriend(
+    friend_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_active_user)
+):
+    '''
+    Hủy kết bạn
+    '''
+    return await FriendshipController.unfriend(current_user["nguoi_dung"].MaNguoiDung, friend_id, db) 

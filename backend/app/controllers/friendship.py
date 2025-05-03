@@ -81,4 +81,14 @@ class FriendshipController:
             LoiMoiKetBan.NguoiNhan == current_user_id,
             LoiMoiKetBan.TrangThai == 0
         ).order_by(LoiMoiKetBan.ThoiGian.desc()).offset(skip).limit(limit).all()
-        return requests 
+        return requests
+
+    @staticmethod
+    async def unfriend(current_user_id: int, friend_id: int, db: Session):
+        # Xóa cả 2 chiều quan hệ bạn bè
+        deleted1 = db.query(BanBe).filter(BanBe.MaNguoiDung == current_user_id, BanBe.MaBanBe == friend_id).delete()
+        deleted2 = db.query(BanBe).filter(BanBe.MaNguoiDung == friend_id, BanBe.MaBanBe == current_user_id).delete()
+        db.commit()
+        if deleted1 == 0 and deleted2 == 0:
+            raise HTTPException(status_code=404, detail="Không tìm thấy quan hệ bạn bè để hủy.")
+        return {"message": "Đã hủy kết bạn thành công."} 
