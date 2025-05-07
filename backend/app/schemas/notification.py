@@ -13,7 +13,9 @@ class NotificationResponse(NotificationBase):
     MaThongBao: int
     ThoiGian: datetime
     DaDoc: int
-    
+    MaBaiViet: Optional[int] = None
+    AnhDaiDien: Optional[str] = None
+
     class Config:
         from_attributes = True
 

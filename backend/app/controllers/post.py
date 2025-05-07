@@ -242,8 +242,8 @@ class CommentController:
             user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == ma_nguoi_dung).first()
             noi_dung_tb = f"{user.TenNguoiDung} đã bình luận về bài viết của bạn: '{binh_luan.NoiDung}'"
             import asyncio
-            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db))
-            # await NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db)
+            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, binh_luan.MaBaiViet, db))
+            # await NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, binh_luan.MaBaiViet, db)
 
         return bl_dict
     
@@ -312,7 +312,7 @@ class LikeController:
             noi_dung_tb = f"{user.TenNguoiDung} đã thích bài viết của bạn."
             # await NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db)
             import asyncio
-            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db))
+            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, ma_bai_viet, db))
 
         return lt_dict
 

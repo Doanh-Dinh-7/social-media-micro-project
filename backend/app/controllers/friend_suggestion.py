@@ -42,5 +42,11 @@ class FriendSuggestionController:
             )
         ).limit(limit).all()
         
-        result = [UserBasicInfo.from_orm(user) for user in suggestions]
+        # Trả về cả ảnh bìa
+        result = [UserBasicInfo(
+            MaNguoiDung=user.MaNguoiDung,
+            TenNguoiDung=user.TenNguoiDung,
+            AnhDaiDien=user.AnhDaiDien,
+            AnhBia=user.AnhBia
+        ) for user in suggestions]
         return FriendSuggestionResponse(suggestions=result, total=len(result)) 

@@ -22,4 +22,4 @@ async def get_notifications(
     '''
     Lấy danh sách thông báo của người dùng hiện tại
     '''
-    return await NotificationController.get_notifications(current_user["nguoi_dung"].MaNguoiDung, skip, limit, db) 
+    return await NotificationController.get_notifications(current_user["nguoi_dung"].MaNguoiDung,db, skip, limit) 

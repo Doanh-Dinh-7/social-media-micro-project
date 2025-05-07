@@ -6,6 +6,7 @@ class UserBasicInfo(BaseModel):
     MaNguoiDung: int
     TenNguoiDung: str
     AnhDaiDien: str | None = None
+    AnhBia: str | None = None
     
     class Config:
         from_attributes = True
