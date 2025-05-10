@@ -51,6 +51,11 @@ class UserController:
             NguoiDung.MaNguoiDung != current_user_id
         ).all()
         result = []
+        # - Quan hệ trong tìm kiếm user
+        #  1: Đã là bạn bè 
+        #  2: Đã gửi lời mời kết bạn (chưa được chấp nhận) 
+        #  3: Đã nhận lời mời kết bạn (chưa chấp nhận) 
+        #  4: Chưa có quan hệ bạn bè và chưa gửi/có lời mời 
         for user in users:
             # Kiểm tra quan hệ bạn bè
             is_friend = db.query(BanBe).filter(

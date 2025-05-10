@@ -21,15 +21,22 @@ class FriendshipController:
         ).first()
         if is_friend:
             raise HTTPException(status_code=400, detail="Đã là bạn bè.")
-        # Đã có lời mời chờ xử lý
+        # Đã có lời mời chờ xử lý hoặc bị từ chối
         existing_request = db.query(LoiMoiKetBan).filter(
             or_(
-                and_(LoiMoiKetBan.NguoiGui == current_user_id, LoiMoiKetBan.NguoiNhan == request.NguoiNhan, LoiMoiKetBan.TrangThai == 0),
-                and_(LoiMoiKetBan.NguoiGui == request.NguoiNhan, LoiMoiKetBan.NguoiNhan == current_user_id, LoiMoiKetBan.TrangThai == 0)
+                and_(LoiMoiKetBan.NguoiGui == current_user_id, LoiMoiKetBan.NguoiNhan == request.NguoiNhan),
+                and_(LoiMoiKetBan.NguoiGui == request.NguoiNhan, LoiMoiKetBan.NguoiNhan == current_user_id)
             )
-        ).first()
+        ).order_by(LoiMoiKetBan.ThoiGian.desc()).first()
         if existing_request:
-            raise HTTPException(status_code=400, detail="Đã có lời mời kết bạn đang chờ xử lý.")
+            if existing_request.TrangThai == 0:
+                raise HTTPException(status_code=400, detail="Đã có lời mời kết bạn đang chờ xử lý.")
+            elif existing_request.TrangThai == 2:
+                # Nếu bị từ chối thì cập nhật lại trạng thái thành 0 (chờ xử lý)
+                existing_request.TrangThai = 0
+                db.commit()
+                db.refresh(existing_request)
+                return existing_request
         # Kiểm tra người nhận tồn tại
         user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == request.NguoiNhan).first()
         if not user:
@@ -91,4 +98,22 @@ class FriendshipController:
         db.commit()
         if deleted1 == 0 and deleted2 == 0:
             raise HTTPException(status_code=404, detail="Không tìm thấy quan hệ bạn bè để hủy.")
-        return {"message": "Đã hủy kết bạn thành công."} 
+        return {"message": "Đã hủy kết bạn thành công."}
+
+    @staticmethod
+    async def cancel_friend_request(current_user_id: int, ma_loi_moi: int, db: Session):
+        friend_request = db.query(LoiMoiKetBan).filter(LoiMoiKetBan.MaLoiMoi == ma_loi_moi).first()
+        if not friend_request:
+            raise HTTPException(status_code=404, detail="Lời mời kết bạn không tồn tại.")
+        if friend_request.NguoiGui != current_user_id:
+            raise HTTPException(status_code=403, detail="Bạn không có quyền huỷ lời mời này.")
+        if friend_request.TrangThai != 0:
+            raise HTTPException(status_code=400, detail="Chỉ có thể huỷ lời mời đang chờ xử lý.")
+        db.delete(friend_request)
+        db.commit()
+        return {"message": "Đã huỷ lời mời kết bạn thành công."} 
+    
+# - Trạng thái lời mời kết bạn:
+#  0: Đã gửi lời mời 
+#  1. Là bạn bè
+#  2: Bị từ chối 
