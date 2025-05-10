@@ -7,7 +7,6 @@ from app.config.settings import settings
 from app.config.database import engine, Base
 from app.routers import auth, user, post, friendship, message, notification, friend_suggestion
 from app.middleware.auth import auth_middleware
-from app.ws_chat import router as ws_chat_router
 import os
 
 # Tạo các bảng trong database
@@ -47,7 +46,7 @@ app.include_router(friendship.router, prefix=settings.API_PREFIX)
 app.include_router(message.router, prefix=settings.API_PREFIX)
 app.include_router(notification.router, prefix=settings.API_PREFIX)
 app.include_router(friend_suggestion.router, prefix=settings.API_PREFIX)
-app.include_router(ws_chat_router)
+
 
 @app.get("/")
 async def root():
