@@ -66,23 +66,26 @@ async def auth_middleware(request: Request, call_next):
             raise HTTPException(status_code=401, detail="Invalid token payload")
 
         db: Session = next(get_db())
-        tai_khoan = db.query(TaiKhoan).filter(TaiKhoan.Email == email).first()
-        if not tai_khoan:
-            print(f"[AUTH] Không tìm thấy user với email: {email}")
-            raise HTTPException(status_code=401, detail="User not found")
+        try:
+            tai_khoan = db.query(TaiKhoan).filter(TaiKhoan.Email == email).first()
+            if not tai_khoan:
+                print(f"[AUTH] Không tìm thấy user với email: {email}")
+                raise HTTPException(status_code=401, detail="User not found")
 
-        if tai_khoan.TrangThai == 0:
-            print(f"[AUTH] Tài khoản bị khóa: {email}")
-            raise HTTPException(status_code=403, detail="Account is disabled")
+            if tai_khoan.TrangThai == 0:
+                print(f"[AUTH] Tài khoản bị khóa: {email}")
+                raise HTTPException(status_code=403, detail="Account is disabled")
 
-        nguoi_dung = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == tai_khoan.MaNguoiDung).first()
-        # Gán user vào request để các hàm khác dùng
-        request.state.current_user = {
-            "tai_khoan": tai_khoan,
-            "nguoi_dung": nguoi_dung
-        }
+            nguoi_dung = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == tai_khoan.MaNguoiDung).first()
+            # Gán user vào request để các hàm khác dùng
+            request.state.current_user = {
+                "tai_khoan": tai_khoan,
+                "nguoi_dung": nguoi_dung
+            }
 
-        return await call_next(request)
+            return await call_next(request)
+        finally:
+            db.close()
         
     except HTTPException as e:
         print(f"[AUTH] HTTPException: {e.detail}")

@@ -8,6 +8,7 @@ from app.config.database import engine, Base
 from app.routers import auth, user, post, friendship, message, notification, friend_suggestion
 from app.middleware.auth import auth_middleware
 import os
+# import app.utils.db_monitor
 
 # Tạo các bảng trong database
 Base.metadata.create_all(bind=engine)
