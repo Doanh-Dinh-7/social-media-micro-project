@@ -98,6 +98,7 @@ class CommentResponse(BinhLuanBase):
     MaNguoiDung: int
     NgayTao: datetime
     TenNguoiDung: str = None
+    AnhDaiDien: Optional[str] = None
 
     class Config:
         from_attributes = True
