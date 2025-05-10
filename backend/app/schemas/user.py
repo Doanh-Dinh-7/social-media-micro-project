@@ -27,6 +27,7 @@ class UserResponse(UserBase):
     NgayTao: datetime
     AnhDaiDien: Optional[str] = None
     AnhBia: Optional[str] = None
+    QuanHe: int
     
     class Config:
         from_attributes  = True

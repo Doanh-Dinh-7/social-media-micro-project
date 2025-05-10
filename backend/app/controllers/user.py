@@ -2,7 +2,7 @@ from fastapi import HTTPException, status, Depends, UploadFile
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
 from app.models.user import NguoiDung, TaiKhoan
-from app.models.friendship import LoiMoiKetBan
+from app.models.friendship import LoiMoiKetBan, BanBe
 from app.schemas.user import UserProfileResponse, UserResponse
 from typing import List
 from app.utils.cloudinary import upload_image
@@ -50,8 +50,45 @@ class UserController:
             NguoiDung.TenNguoiDung.ilike(f"%{keyword}%"),
             NguoiDung.MaNguoiDung != current_user_id
         ).all()
-        
-        return [UserResponse.from_orm(user) for user in users]
+        result = []
+        for user in users:
+            # Kiểm tra quan hệ bạn bè
+            is_friend = db.query(BanBe).filter(
+                ((BanBe.MaNguoiDung == current_user_id) & (BanBe.MaBanBe == user.MaNguoiDung)) |
+                ((BanBe.MaNguoiDung == user.MaNguoiDung) & (BanBe.MaBanBe == current_user_id))
+            ).first()
+            if is_friend:
+                quan_he = 1  # Đã là bạn bè
+            else:
+                # Kiểm tra đã gửi lời mời kết bạn chưa
+                da_gui_loi_moi = db.query(LoiMoiKetBan).filter(
+                    LoiMoiKetBan.NguoiGui == current_user_id,
+                    LoiMoiKetBan.NguoiNhan == user.MaNguoiDung,
+                    LoiMoiKetBan.TrangThai == 0
+                ).first()
+                if da_gui_loi_moi:
+                    quan_he = 2  # Đã gửi lời mời kết bạn
+                else:
+                    duoc_gui_loi_moi = db.query(LoiMoiKetBan).filter(
+                        LoiMoiKetBan.NguoiNhan == current_user_id,
+                        LoiMoiKetBan.NguoiGui == user.MaNguoiDung,
+                        LoiMoiKetBan.TrangThai == 0
+                    ).first()
+                    if duoc_gui_loi_moi:
+                        quan_he = 3  # Đã nhận lời mời kết bạn
+                    else:
+                        quan_he = 4  # Chưa có quan hệ
+            # Tạo dict đầy đủ các trường
+            user_dict = {
+                "MaNguoiDung": user.MaNguoiDung,
+                "TenNguoiDung": user.TenNguoiDung,
+                "NgayTao": user.NgayTao,
+                "AnhDaiDien": user.AnhDaiDien,
+                "AnhBia": user.AnhBia,
+                "QuanHe": quan_he
+            }
+            result.append(UserResponse(**user_dict))
+        return result
     
     @staticmethod
     async def update_profile(user_id: int, ten_nguoi_dung: str, db: Session):
