@@ -11,6 +11,7 @@ class MessageController:
     @staticmethod
     async def send_message(current_user_id: int, data: MessageCreate, db: Session):
         # Kiểm tra bạn bè
+        print(f"[MESSAGE] Gửi tin nhắn từ {current_user_id} đến {data.NguoiNhan}")
         if data.NguoiNhan:
             is_friend = db.query(BanBe).filter(BanBe.MaNguoiDung == current_user_id, BanBe.MaBanBe == data.NguoiNhan).first()
             if not is_friend:

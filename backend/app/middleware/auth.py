@@ -22,7 +22,9 @@ PUBLIC_ENDPOINTS = [
 ]
 
 async def auth_middleware(request: Request, call_next):
-
+    # Bỏ qua xác thực cho WebSocket
+    if request.scope["type"] == "websocket":
+        return await call_next(request)
     # Kiểm tra nếu là endpoint công khai
     if request.url.path in PUBLIC_ENDPOINTS:
         return await call_next(request)
