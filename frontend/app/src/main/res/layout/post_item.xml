@@ -22,11 +22,24 @@
             android:orientation="horizontal"
             android:padding="8dp">
 
-            <ImageView
+            <androidx.cardview.widget.CardView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/user_img" />
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                android:layout_gravity="center_vertical"
+                app:cardPreventCornerOverlap="false"
+                app:cardUseCompatPadding="false">
+
+                <ImageView
+                    android:id="@+id/imgAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@mipmap/user_img" />
+            </androidx.cardview.widget.CardView>
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -41,6 +54,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/txtTen"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Phạm Ngọc"
@@ -56,7 +70,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thơ vườn tập sự"
+                    android:text="Thợ vườn tập sự"
                     android:textColor="#808080"
                     android:textSize="14sp" />
 
@@ -70,21 +84,31 @@
                         android:id="@+id/txtChuDe"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
                         android:text="Đời sống"
                         android:textColor="#808080"
                         android:textSize="12sp" />
 
                     <TextView
+                        android:id="@+id/textView4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:text="• 15 phút"
+                        android:layout_marginRight="2dp"
+                        android:text="•"
+                        android:textColor="#808080" />
+
+                    <TextView
+                        android:id="@+id/txtThoiGian"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15 phút"
                         android:textColor="#808080"
                         android:textSize="12sp" />
 
                     <ImageView
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
+                        android:id="@+id/imgPrivacyIcon"
+                        android:layout_width="15dp"
+                        android:layout_height="match_parent"
                         android:layout_marginStart="4dp"
                         android:src="@mipmap/ic_public" />
                 </LinearLayout>
@@ -160,10 +184,10 @@
                 android:text="lượt thích" />
 
             <TextView
-                android:id="@+id/txtSoLuotBinhLuan"
+                android:id="@+id/txtSoBinhLuan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="195dp"
+                android:layout_marginStart="180dp"
                 android:paddingRight="4dp"
                 android:text="0" />
 
@@ -204,7 +228,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Thích" />
+                    android:text="Thích"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -225,7 +250,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Bình luận" />
+                    android:text="Bình luận"
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 

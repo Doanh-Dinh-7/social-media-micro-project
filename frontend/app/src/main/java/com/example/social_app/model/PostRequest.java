@@ -5,7 +5,7 @@ import java.util.List;
 public class PostRequest {
     private String noi_dung;
     private int ma_quyen_rieng_tu;
-    private Integer ma_chu_de;  // Integer vì nó có thể là null
+    private Integer ma_chu_de;
     private List<String> images;
 
     // Constructor

@@ -1,8 +1,6 @@
 package com.example.social_app.view.fragments;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,13 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.example.social_app.R;
 import com.example.social_app.view.activities.LoginActivity;
-import com.example.social_app.view.activities.PostActivity;
 import com.example.social_app.view.activities.RegisterActivity;
 import com.google.android.material.textfield.TextInputEditText;
 

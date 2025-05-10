@@ -1,7 +1,6 @@
 package com.example.social_app.view.fragments;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -31,41 +32,28 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.social_app.R;
-import com.example.social_app.model.CloudinaryUploadResult;
-import com.example.social_app.model.PostRequest;
 import com.example.social_app.model.PostResponse;
+import com.example.social_app.model.UserInfoResponse;
 import com.example.social_app.network.ApiService;
-import com.example.social_app.network.CloudinaryService;
 import com.example.social_app.network.RetrofitClient;
-import com.example.social_app.view.activities.LoginActivity;
 import com.example.social_app.view.activities.PostActivity;
 import com.example.social_app.view.adapters.ImageAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CreatePostFragment extends Fragment {
     private ImageButton btnClose;
@@ -83,6 +71,9 @@ public class CreatePostFragment extends Fragment {
     private ArrayList<Uri> selectedImageUris = new ArrayList<>();
     private ImageAdapter imageAdapter;
     private ActivityResultLauncher<Intent> galleryLauncher;
+    private TextView txtUserName;
+    private ApiService apiService;
+
 
     @Nullable
     @Override
@@ -94,8 +85,42 @@ public class CreatePostFragment extends Fragment {
         setupGalleryLauncher();
         updateButtonState();
 
+        txtUserName = view.findViewById(R.id.txtUserName);
+
+        SharedPreferences preferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
+        int userId = preferences.getInt("user_id", -1);
+        String token = preferences.getString("auth_token", "");
+
+        if (userId != -1 && !token.isEmpty()) {
+            getUserInfo(userId, token);
+        }
+
         return view;
     }
+
+    private void getUserInfo(int userId, String token) {
+        apiService = RetrofitClient.getClient().create(ApiService.class);
+        Call<UserInfoResponse> call = apiService.getUserInfo("Bearer " + token, userId);
+
+        call.enqueue(new Callback<UserInfoResponse>() {
+            @Override
+            public void onResponse(Call<UserInfoResponse> call, Response<UserInfoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String username = response.body().getTenNguoiDung();
+                    txtUserName.setText(username);
+                } else {
+                    txtUserName.setText("Không thể lấy thông tin người dùng");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserInfoResponse> call, Throwable t) {
+                txtUserName.setText("Lỗi kết nối");
+            }
+        });
+    }
+
+
 
     private void initViews(View view) {
         btnClose = view.findViewById(R.id.btnClose);
@@ -110,7 +135,7 @@ public class CreatePostFragment extends Fragment {
     }
 
     private void setupListeners() {
-        btnClose.setOnClickListener(v -> ((PostActivity) getActivity()).onBack());
+        btnClose.setOnClickListener(v -> ((PostActivity) getActivity()).onBackPressed());
         btnTopic.setOnClickListener(v -> showTopicBottomSheet());
         btnObject.setOnClickListener(v -> showObjectBottomSheet());
         imgPicture.setOnClickListener(v -> openGallery());
@@ -151,7 +176,6 @@ public class CreatePostFragment extends Fragment {
                             int count = data.getClipData().getItemCount();
                             for (int i = 0; i < count; i++) {
                                 Uri uri = data.getClipData().getItemAt(i).getUri();
-//                                selectedImageUris.add(Uri.parse("content://fake/test.jpg"));
                                 selectedImageUris.add(uri);
                             }
                         } else if (data.getData() != null) {
@@ -205,6 +229,20 @@ public class CreatePostFragment extends Fragment {
 
         sheetView.findViewById(R.id.optionLife).setOnClickListener(v -> {
             selectedTopic = "Đời sống";
+            txtTopic.setText(selectedTopic + " ▼");
+            bottomSheetDialog.dismiss();
+            updateButtonState();
+        });
+
+        sheetView.findViewById(R.id.optionQuestion).setOnClickListener(v -> {
+            selectedTopic = "Hỏi đáp";
+            txtTopic.setText(selectedTopic + " ▼");
+            bottomSheetDialog.dismiss();
+            updateButtonState();
+        });
+
+        sheetView.findViewById(R.id.optionDifference).setOnClickListener(v -> {
+            selectedTopic = "Khác";
             txtTopic.setText(selectedTopic + " ▼");
             bottomSheetDialog.dismiss();
             updateButtonState();
@@ -271,6 +309,10 @@ public class CreatePostFragment extends Fragment {
                 return 1;
             case "Đời sống":
                 return 2;
+            case "Hỏi đáp":
+                return 3;
+            case "Khác":
+                return 4;
             default:
                 return -1;
         }
@@ -321,6 +363,7 @@ public class CreatePostFragment extends Fragment {
 
         // Gửi request lên server
         sendPostToServer(authToken, noiDung, maQuyenRiengTu, maChuDe);
+        ((PostActivity) getActivity()).showBottomNavigationView();
     }
 
     private void sendPostToServer(String authToken, String noiDung, int maQuyenRiengTu, Integer maChuDe) {
@@ -359,17 +402,6 @@ public class CreatePostFragment extends Fragment {
             public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getActivity(), "Đăng bài thành công", Toast.LENGTH_SHORT).show();
-                    // TODO: Chuyển màn hoặc làm gì tiếp
-                    // Chuyển sang PostFragment và truyền dữ liệu bài viết mới
-
-//                    PostResponse createdPost = response.body();
-//
-//
-//                    Bundle bundle = new Bundle();
-//                    bundle.putSerializable("new_post", createdPost); // PostResponse phải implement Serializable
-//
-//                    PostFragment postFragment = new PostFragment();
-//                    postFragment.setArguments(bundle);
 
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, new PostFragment())

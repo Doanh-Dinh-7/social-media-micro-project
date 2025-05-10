@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import com.bumptech.glide.Glide;
-import com.example.social_app.R;
 import com.example.social_app.model.HinhAnh;
 
 import java.util.List;
@@ -41,12 +40,12 @@ public class ImageUrlAdapter extends BaseAdapter {
 
         if (convertView == null) {
             imageView = new ImageView(context);
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(300, 300)); // size ảnh
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(300, 300));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         } else {
             imageView = (ImageView) convertView;
         }
-        // Lấy URL từ object HinhAnh
+
         String imageUrl = imageUrls.get(position).getUrl();
 
         Glide.with(context)

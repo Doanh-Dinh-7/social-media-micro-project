@@ -1,6 +1,8 @@
 package com.example.social_app.view.adapters;
 
 import android.content.Context;
+import android.os.Handler;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +13,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.social_app.R;
 import com.example.social_app.model.CommentResponse;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
     private List<CommentResponse> commentList;
@@ -46,13 +53,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         holder.txtUserName.setText(comment.getTenNguoiDung());
         holder.txtCommentContent.setText(comment.getNoiDung());
-        holder.txtCommentTime.setText(comment.getNgayTao());
-
-        Log.d("CommentAdapter", "Current User ID: " + currentUserId);
-        Log.d("CommentAdapter", "Comment Author ID: " + comment.getMaNguoiDung());
+        holder.txtCommentTime.setText(getTimeAgo(comment.getNgayTao()));
+        holder.bindTime(comment.getNgayTao());
 
 
-        // Gắn long click cho từng item
         holder.itemView.setOnLongClickListener(v -> {
             if (comment.getMaNguoiDung() == currentUserId) {
                 showBottomSheet(holder.itemView.getContext(), comment);
@@ -84,6 +88,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView txtUserName, txtCommentContent, txtCommentTime;
         ImageView imgAvatar;
+        private Handler handler = new Handler();
+        private Runnable timeUpdater;
+        private String originalTime;
 
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -92,13 +99,67 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             txtCommentTime = itemView.findViewById(R.id.txtCommentTime);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
         }
+        public void bindTime(String ngayTao) {
+            originalTime = ngayTao;
+            updateTime(); // Gọi lần đầu
+
+            if (timeUpdater != null) {
+                handler.removeCallbacks(timeUpdater);
+            }
+
+            timeUpdater = new Runnable() {
+                @Override
+                public void run() {
+                    updateTime();
+                    handler.postDelayed(this, 60000); // Cập nhật sau mỗi phút
+                }
+            };
+            handler.postDelayed(timeUpdater, 60000);
+        }
+
+        private void updateTime() {
+            txtCommentTime.setText(CommentAdapter.getTimeAgo(originalTime));
+        }
+
     }
+
 
     public void setCommentList(List<CommentResponse> newCommentList) {
         this.commentList = newCommentList;
         notifyDataSetChanged();
         if (listener != null) {
             listener.onCommentCountChanged(getItemCount());
+        }
+    }
+
+    public static String getTimeAgo(String isoTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        try {
+            Date commentDate = sdf.parse(isoTime);
+            long now = System.currentTimeMillis();
+            long time = commentDate.getTime();
+
+            long diff = now - time;
+
+            if (diff < DateUtils.MINUTE_IN_MILLIS) {
+                return "Vừa xong";
+            } else if (diff < DateUtils.HOUR_IN_MILLIS) {
+                long minutes = diff / DateUtils.MINUTE_IN_MILLIS;
+                return minutes + " phút trước";
+            } else if (diff < DateUtils.DAY_IN_MILLIS) {
+                long hours = diff / DateUtils.HOUR_IN_MILLIS;
+                return hours + " giờ trước";
+            } else if (diff < 2 * DateUtils.DAY_IN_MILLIS) {
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                return "Hôm qua lúc " + timeFormat.format(commentDate);
+            } else {
+                SimpleDateFormat fullFormat = new SimpleDateFormat("dd 'Tháng' MM 'lúc' HH:mm", Locale.getDefault());
+                return fullFormat.format(commentDate);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
         }
     }
 }

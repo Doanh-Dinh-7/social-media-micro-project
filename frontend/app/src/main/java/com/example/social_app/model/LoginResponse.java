@@ -30,4 +30,8 @@ public class LoginResponse {
     public NguoiDung getUser() {
         return user;
     }
+
+    public void setUser(NguoiDung user) {
+        this.user = user;
+    }
 }

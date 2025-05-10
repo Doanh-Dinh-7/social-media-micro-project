@@ -1,9 +1,13 @@
 package com.example.social_app.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ThongBao {
     private int maThongBao;
     private int maNguoiDung;
+    @SerializedName("NoiDung")
     private String noiDung;
+    @SerializedName("ThoiGian")
     private String thoiGian;
     private boolean daDoc;
 

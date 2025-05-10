@@ -115,36 +115,5 @@ public class PostResponse  implements Serializable {
         this.da_thich = da_thich;
     }
 
-    // Inner class for NguoiDung
-    public static class NguoiDung {
-        private String TenNguoiDung;
-        private int MaNguoiDung;
-        private String NgayTao;
-
-        // Getters and Setters
-        public String getTenNguoiDung() {
-            return TenNguoiDung;
-        }
-
-        public void setTenNguoiDung(String tenNguoiDung) {
-            TenNguoiDung = tenNguoiDung;
-        }
-
-        public int getMaNguoiDung() {
-            return MaNguoiDung;
-        }
-
-        public void setMaNguoiDung(int maNguoiDung) {
-            MaNguoiDung = maNguoiDung;
-        }
-
-        public String getNgayTao() {
-            return NgayTao;
-        }
-
-        public void setNgayTao(String ngayTao) {
-            NgayTao = ngayTao;
-        }
-    }
 }
 

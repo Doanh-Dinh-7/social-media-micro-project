@@ -100,7 +100,7 @@
                 app:boxCornerRadiusTopEnd="15dp"
                 app:boxCornerRadiusTopStart="15dp"
                 app:startIconDrawable="@mipmap/gender"
-                app:startIconTint="#777B84"> <!-- Thêm icon nếu cần -->
+                app:startIconTint="#777B84" > <!-- Thêm icon nếu cần -->
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_gender"

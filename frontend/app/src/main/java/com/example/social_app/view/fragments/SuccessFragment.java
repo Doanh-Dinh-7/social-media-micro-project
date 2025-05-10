@@ -1,6 +1,5 @@
 package com.example.social_app.view.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,10 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.example.social_app.R;
-import com.example.social_app.view.activities.LoginActivity;
 import com.example.social_app.view.activities.RegisterActivity;
 
 public class SuccessFragment extends Fragment {

@@ -47,14 +47,18 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void goToSuccess() { loadFragment(new SuccessFragment());}
     public void goToUserInfor(String email) {
+        String token = getSharedPreferences("MyPrefs", MODE_PRIVATE).getString("TOKEN", "");
+
         Bundle bundle = new Bundle();
         bundle.putString("EMAIL", email);
+        bundle.putString("TOKEN", token);  // Chuyển token vào UserInforFragment
 
         UserInforFragment userInforFragment = new UserInforFragment();
         userInforFragment.setArguments(bundle);
 
         loadFragment(userInforFragment);
     }
+
     public void registerUser(String email, String matKhau) {
         RegisterRequest request = new RegisterRequest("user", email, matKhau);
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
@@ -63,9 +67,16 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    // Lưu token sau khi đăng ký thành công
+                    String token = response.body().getAccessToken(); // Đảm bảo rằng getAccessToken() trả về token đúng
+                    getSharedPreferences("MyPrefs", MODE_PRIVATE)
+                            .edit()
+                            .putString("TOKEN", token)  // Lưu token
+                            .apply();
+
                     Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
 
-                    // Chuyển sang màn hình đăng nhập
+                    // Chuyển sang SuccessFragment
                     goToSuccess();
                 } else {
                     Toast.makeText(RegisterActivity.this, "Đăng ký thất bại!", Toast.LENGTH_SHORT).show();

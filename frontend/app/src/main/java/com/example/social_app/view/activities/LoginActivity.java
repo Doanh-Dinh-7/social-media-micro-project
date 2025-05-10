@@ -9,7 +9,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import com.example.social_app.MainActivity;
 import com.example.social_app.R;
 import com.example.social_app.model.LoginRequest;
 import com.example.social_app.model.LoginResponse;
@@ -18,7 +17,6 @@ import com.example.social_app.network.ApiService;
 import com.example.social_app.network.RetrofitClient;
 import com.example.social_app.view.fragments.LoginFormFragment;
 import com.example.social_app.view.fragments.LoginOptionsFragment;
-import com.example.social_app.view.fragments.PostFragment;
 
 import retrofit2.Call;
 import retrofit2.Callback;

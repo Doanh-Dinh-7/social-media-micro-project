@@ -1,57 +1,67 @@
 package com.example.social_app.model;
 
 public class LoiMoiKetBan {
-    private int maLoiMoi;
-    private int nguoiGui;
-    private int nguoiNhan;
-    private int trangThai;
-    private String thoiGian;
-
-    public LoiMoiKetBan(int maLoiMoi, int nguoiGui, int nguoiNhan, int trangThai, String thoiGian) {
-        this.maLoiMoi = maLoiMoi;
-        this.nguoiGui = nguoiGui;
-        this.nguoiNhan = nguoiNhan;
-        this.trangThai = trangThai;
-        this.thoiGian = thoiGian;
-    }
+    private int MaLoiMoi;
+    private int NguoiGui;
+    private int NguoiNhan;
+    private int TrangThai;
+    private String ThoiGian;
+    private NguoiDung nguoi_gui;
+    private NguoiDung nguoi_nhan;
 
     public int getMaLoiMoi() {
-        return maLoiMoi;
+        return MaLoiMoi;
     }
 
     public void setMaLoiMoi(int maLoiMoi) {
-        this.maLoiMoi = maLoiMoi;
+        MaLoiMoi = maLoiMoi;
     }
 
     public int getNguoiGui() {
-        return nguoiGui;
+        return NguoiGui;
     }
 
     public void setNguoiGui(int nguoiGui) {
-        this.nguoiGui = nguoiGui;
+        NguoiGui = nguoiGui;
     }
 
     public int getNguoiNhan() {
-        return nguoiNhan;
+        return NguoiNhan;
     }
 
     public void setNguoiNhan(int nguoiNhan) {
-        this.nguoiNhan = nguoiNhan;
+        NguoiNhan = nguoiNhan;
     }
 
     public int getTrangThai() {
-        return trangThai;
+        return TrangThai;
     }
 
     public void setTrangThai(int trangThai) {
-        this.trangThai = trangThai;
+        TrangThai = trangThai;
     }
 
     public String getThoiGian() {
-        return thoiGian;
+        return ThoiGian;
     }
 
     public void setThoiGian(String thoiGian) {
-        this.thoiGian = thoiGian;
+        ThoiGian = thoiGian;
+    }
+
+    public NguoiDung getNguoi_gui() {
+        return nguoi_gui;
+    }
+
+    public void setNguoi_gui(NguoiDung nguoi_gui) {
+        this.nguoi_gui = nguoi_gui;
+    }
+
+    public NguoiDung getNguoi_nhan() {
+        return nguoi_nhan;
+    }
+
+    public void setNguoi_nhan(NguoiDung nguoi_nhan) {
+        this.nguoi_nhan = nguoi_nhan;
     }
 }

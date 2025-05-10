@@ -10,4 +10,10 @@
         <item name="colorControlActivated">#FFBE64</item> <!-- Màu viền khi đã chọn -->
     </style>
 
+    <style name="BottomNavigationStyle" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/nav_item_color</item>
+        <item name="itemTextColor">@color/nav_item_color</item>
+        <item name="android:background">#FFFFFF</item>
+    </style>
+
 </resources>

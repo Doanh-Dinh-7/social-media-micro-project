@@ -44,14 +44,14 @@ public class ImageAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.item_image, parent, false);
         }
 
-        ImageView imageView = view.findViewById(R.id.imgSelected);
+        ImageView imageView = view.findViewById(R.id.image);
         ImageButton btnRemove = view.findViewById(R.id.btnRemove);
 
         imageView.setImageURI(imageUris.get(position));
 
         btnRemove.setOnClickListener(v -> {
             imageUris.remove(position);
-            notifyDataSetChanged(); // cập nhật lại giao diện
+            notifyDataSetChanged(); //
         });
 
         return view;
