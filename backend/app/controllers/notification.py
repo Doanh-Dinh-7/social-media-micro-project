@@ -12,9 +12,10 @@ class NotificationController:
         for tb in notifications:
             # Lấy thông tin người gửi nếu có (giả sử có trường NguoiGui hoặc MaNguoiGui trong ThongBao)
             avatar = None
-            if hasattr(tb, 'NguoiGui') and tb.NguoiGui:
-                user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == tb.NguoiGui).first()
+            if hasattr(tb, 'MaNguoiGui') and tb.MaNguoiGui:
+                user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == tb.MaNguoiGui).first()
                 avatar = user.AnhDaiDien if user else None
+            
             # Lấy mã bài viết nếu có
             ma_bai_viet = getattr(tb, 'MaBaiViet', None)
             result.append({
@@ -29,8 +30,8 @@ class NotificationController:
         return result
 
     @staticmethod
-    async def create_notification(ma_nguoi_nhan: int, noi_dung: str, ma_bai_viet: int, db: Session):
-        thong_bao = ThongBao(MaNguoiDung=ma_nguoi_nhan, NoiDung=noi_dung, MaBaiViet=ma_bai_viet)
+    async def create_notification( ma_nguoi_nhan: int, noi_dung: str, ma_bai_viet: int, ma_nguoi_gui: int, db: Session):
+        thong_bao = ThongBao(MaNguoiDung=ma_nguoi_nhan, NoiDung=noi_dung, MaBaiViet=ma_bai_viet, MaNguoiGui=ma_nguoi_gui)
         db.add(thong_bao)
         db.commit()
         db.refresh(thong_bao)

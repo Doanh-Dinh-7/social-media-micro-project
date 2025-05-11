@@ -12,6 +12,7 @@ class ThongBao(Base):
     ThoiGian = Column(DateTime, nullable=False, default=datetime.now)
     DaDoc = Column(Integer, default=0)  # 0: Chưa đọc, 1: Đã đọc
     MaBaiViet = Column(Integer, nullable=True)
+    MaNguoiGui = Column(Integer, nullable=True)
 
     # Relationship
     nguoi_dung = relationship("NguoiDung", back_populates="thong_bao")

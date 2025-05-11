@@ -38,14 +38,22 @@ class FriendshipController:
                 db.refresh(existing_request)
                 return existing_request
         # Kiểm tra người nhận tồn tại
-        user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == request.NguoiNhan).first()
-        if not user:
+        user_nhan = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == request.NguoiNhan).first()
+        if not user_nhan:
             raise HTTPException(status_code=404, detail="Người nhận không tồn tại.")
         # Tạo lời mời
         friend_request = LoiMoiKetBan(NguoiGui=current_user_id, NguoiNhan=request.NguoiNhan)
         db.add(friend_request)
         db.commit()
         db.refresh(friend_request)
+        
+        # Tạo thông báo
+        if request.NguoiNhan != current_user_id:
+            user_gui = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == current_user_id).first()
+            noi_dung = f"{user_gui.TenNguoiDung} đã gửi lời mời kết bạn tới bạn."
+            import asyncio
+            asyncio.create_task(NotificationController.create_notification(request.NguoiNhan, noi_dung, None, current_user_id, db))
+        
         return friend_request
 
     @staticmethod

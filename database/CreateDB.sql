@@ -166,5 +166,6 @@ ADD AnhDaiDien NVARCHAR(500),
     AnhBia NVARCHAR(500);
 
 ALTER TABLE ThongBao
-ADD MaBaiViet INT NULL;
+ADD MaBaiViet INT NULL,
+    MaNguoiGui INT NULL;
 

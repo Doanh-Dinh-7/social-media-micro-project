@@ -222,7 +222,7 @@ class CommentController:
         bai_viet = db.query(BaiViet).filter(BaiViet.MaBaiViet == binh_luan.MaBaiViet).first()
         if not bai_viet:
             raise HTTPException(status_code=404, detail="Bài viết không tồn tại")
-
+        user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == ma_nguoi_dung).first()
         db_binh_luan = BinhLuan(
             MaBaiViet=binh_luan.MaBaiViet,
             MaNguoiDung=ma_nguoi_dung,
@@ -236,13 +236,14 @@ class CommentController:
         # Lấy thông tin người dùng
         bl_dict = CommentResponse.from_orm(db_binh_luan).dict()
         bl_dict["TenNguoiDung"] = db_binh_luan.nguoi_dung.TenNguoiDung
+        bl_dict["AnhDaiDien"] = user.AnhDaiDien
 
         # Chỉ tạo thông báo nếu người bình luận KHÁC chủ bài viết
         if bai_viet.MaNguoiDung != ma_nguoi_dung:
             user = db.query(NguoiDung).filter(NguoiDung.MaNguoiDung == ma_nguoi_dung).first()
             noi_dung_tb = f"{user.TenNguoiDung} đã bình luận về bài viết của bạn: '{binh_luan.NoiDung}'"
             import asyncio
-            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, binh_luan.MaBaiViet, db))
+            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, binh_luan.MaBaiViet, ma_nguoi_dung, db))
             # await NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, binh_luan.MaBaiViet, db)
 
         return bl_dict
@@ -312,7 +313,7 @@ class LikeController:
             noi_dung_tb = f"{user.TenNguoiDung} đã thích bài viết của bạn."
             # await NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, db)
             import asyncio
-            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, ma_bai_viet, db))
+            asyncio.create_task(NotificationController.create_notification(bai_viet.MaNguoiDung, noi_dung_tb, ma_bai_viet, ma_nguoi_dung, db))
 
         return lt_dict
 
