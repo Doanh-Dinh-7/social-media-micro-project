@@ -6,13 +6,15 @@ public class NguoiDung {
     private String NgayTao;
     private String AnhDaiDien;
     private String AnhBia;
+    private int QuanHe;
 
-    public NguoiDung(String TenNguoiDung, int MaNguoiDung, String NgayTao, String AnhDaiDien, String AnhBia) {
+    public NguoiDung(String TenNguoiDung, int MaNguoiDung, String NgayTao, String AnhDaiDien, String AnhBia, int QuanHe) {
         this.TenNguoiDung = TenNguoiDung;
         this.MaNguoiDung = MaNguoiDung;
         this.NgayTao = NgayTao;
         this.AnhDaiDien = AnhDaiDien;
         this.AnhBia = AnhBia;
+        this.QuanHe = QuanHe;
     }
 
     public String getTenNguoiDung() {
@@ -52,5 +54,12 @@ public class NguoiDung {
 
     public void setAnhBia(String anhBia) {
         AnhBia = anhBia;
+    }
+    public int getQuanHe() {
+        return QuanHe;
+    }
+
+    public void setQuanHe(int quanHe) {
+        QuanHe = quanHe;
     }
 }

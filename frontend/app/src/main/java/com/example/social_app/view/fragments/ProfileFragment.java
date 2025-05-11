@@ -81,7 +81,6 @@ public class ProfileFragment extends Fragment {
     private ActivityResultLauncher<Intent> coverPicLauncher;
 
     public ProfileFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -99,7 +98,6 @@ public class ProfileFragment extends Fragment {
         btnFriendList = view.findViewById(R.id.btnFriendList);
         txtSoBanBe = view.findViewById(R.id.txtSoBanBe);
 
-        // Setup the ActivityResultContracts
         profilePicLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == getActivity().RESULT_OK && result.getData() != null) {
                 Uri selectedImageUri = result.getData().getData();
@@ -341,7 +339,7 @@ public class ProfileFragment extends Fragment {
                                 .load(AnhBiaUrl)
                                 .into(imgCover);
                     } else {
-                        imgCover.setImageResource(R.mipmap.user_img);
+                        imgCover.setImageResource(R.mipmap.anhbia);
                     }
                 }
             }

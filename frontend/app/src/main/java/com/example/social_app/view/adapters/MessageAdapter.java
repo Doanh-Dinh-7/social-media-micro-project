@@ -33,12 +33,16 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemViewType(int position) {
         MessageResponse message = messageList.get(position);
-        if (message.getNguoi_gui() != null && message.getNguoi_gui().getMaNguoiDung() == currentUserId) {
+
+        int senderId = (message.getNguoi_gui() != null) ? message.getNguoi_gui().getMaNguoiDung() : message.getMaNguoiGui();
+        if (senderId == currentUserId) {
             return TYPE_SENT;
         } else {
             return TYPE_RECEIVED;
         }
     }
+
+
 
     @NonNull
     @Override
@@ -62,6 +66,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
     }
+
 
     @Override
     public int getItemCount() {
