@@ -46,29 +46,4 @@
             android:textColor="@android:color/darker_gray"/>
     </LinearLayout>
 
-    <!-- Thay thế Button bằng TextView khi là "Bạn bè" -->
-    <LinearLayout
-        android:id="@+id/btnFriendRequestContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical">
-
-        <Button
-            android:id="@+id/btnFriendRequest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Kết bạn"
-            android:textColor="@android:color/white"
-            android:background="@color/orange"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/txtFriendStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bạn bè"
-            android:textSize="14sp"
-            android:textColor="@android:color/black"
-            android:visibility="gone" />
-    </LinearLayout>
 </LinearLayout>

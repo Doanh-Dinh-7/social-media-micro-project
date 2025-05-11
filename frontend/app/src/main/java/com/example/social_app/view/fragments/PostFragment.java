@@ -62,14 +62,12 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
     private LinearLayout layoutSearchHeader;
     private boolean isSearching = false;
     private ImageView btnMessage;
-    private List<LoiMoiKetBan> friendRequests;
-    private int currentUserId = 1; // Giả sử ID của người dùng hiện tại là 1
+    private int currentUserId;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // Set status bar color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && getActivity() != null) {
             Window window = getActivity().getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -77,7 +75,6 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
             window.setStatusBarColor(ContextCompat.getColor(requireContext(), R.color.orange));
         }
 
-        // Bind views
         edtSearch = view.findViewById(R.id.edt_search);
         tabLayout = view.findViewById(R.id.tabLayout);
         recyclerView = view.findViewById(R.id.recyclerView);
@@ -85,7 +82,6 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
         layoutSearchHeader = view.findViewById(R.id.layout_search_header);
         btnMessage = view.findViewById(R.id.btn_message);
 
-        // Set up the message button
         btnMessage.setOnClickListener(v -> {
             ((PostActivity) getActivity()).hideBottomNavigationView();
             ConversationFragment conversationFragment = new ConversationFragment();
@@ -95,26 +91,18 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
                     .commit();
         });
 
-        // Get auth token from SharedPreferences
         SharedPreferences sharedPref = requireContext().getSharedPreferences("user_data", MODE_PRIVATE);
         authToken = sharedPref.getString("auth_token", "");
 
-        // Set up main RecyclerView for posts
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(postList, getContext(), this, this);
         recyclerView.setAdapter(postAdapter);
 
-        // Set up search results RecyclerView
         searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Load friend requests
-        loadFriendRequests();
-
-        // Load posts
         loadPosts();
 
-        // Search listener for EditText
         edtSearch.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 ((PostActivity) requireActivity()).hideBottomNavigationView();
@@ -136,13 +124,19 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
                     recyclerView.setVisibility(View.GONE);
                     layoutSearchHeader.setVisibility(View.VISIBLE);
                     searchResultsRecyclerView.setVisibility(View.VISIBLE);
-                    searchUsers(query, false); // false: không hiển thị nút kết bạn trong trang tìm kiếm
+                    ((PostActivity) requireActivity()).hideBottomNavigationView();
+                    searchUsers(query);
                 } else {
                     isSearching = false;
                     tabLayout.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.VISIBLE);
                     layoutSearchHeader.setVisibility(View.GONE);
                     searchResultsRecyclerView.setVisibility(View.GONE);
+
+                    InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(edtSearch.getWindowToken(), 0);
+
+                    ((PostActivity) requireActivity()).showBottomNavigationView();
                 }
             }
 
@@ -150,37 +144,34 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
             public void afterTextChanged(Editable s) {}
         });
 
-        edtSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                        (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+        edtSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
 
-                    String query = edtSearch.getText().toString().trim();
-                    if (!query.isEmpty()) {
-                        isSearching = true;
-                        tabLayout.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.GONE);
-                        layoutSearchHeader.setVisibility(View.VISIBLE);
-                        searchResultsRecyclerView.setVisibility(View.VISIBLE);
-                        searchUsers(query, false);
-                    } else {
-                        Toast.makeText(getContext(), "Vui lòng nhập từ khóa", Toast.LENGTH_SHORT).show();
-                    }
-
-                    // Ẩn bàn phím
+                String query = edtSearch.getText().toString().trim();
+                if (!query.isEmpty()) {
                     InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(edtSearch.getWindowToken(), 0);
 
-                    return true; // Đã xử lý sự kiện
+                    SearchFragment userSearchFragment = new SearchFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("keyword", query);
+                    userSearchFragment.setArguments(bundle);
+
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, userSearchFragment)
+                            .addToBackStack(null)
+                            .commit();
+                } else {
+                    Toast.makeText(getContext(), "Vui lòng nhập từ khoá", Toast.LENGTH_SHORT).show();
                 }
-                return false;
+                return true;
             }
+            return false;
         });
 
 
-
-        // Set up tabs
         if (tabLayout != null) {
             tabLayout.addTab(tabLayout.newTab().setText("Tất cả"));
             tabLayout.addTab(tabLayout.newTab().setText("Kinh nghiệm"));
@@ -238,26 +229,7 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
         });
     }
 
-    private void loadFriendRequests() {
-        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
-        apiService.getFriendRequest("Bearer " + authToken).enqueue(new Callback<List<LoiMoiKetBan>>() {
-            @Override
-            public void onResponse(Call<List<LoiMoiKetBan>> call, Response<List<LoiMoiKetBan>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    friendRequests = response.body();
-                } else {
-                    Toast.makeText(getContext(), "Không thể lấy danh sách lời mời", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<LoiMoiKetBan>> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi kết nối khi tải lời mời", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void searchUsers(String query, boolean showFriendButton) {
+    private void searchUsers(String query) {
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
         apiService.searchUsers("Bearer " + authToken, query).enqueue(new Callback<List<NguoiDung>>() {
             @Override
@@ -268,23 +240,7 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
                         Toast.makeText(getContext(), "Không tìm thấy người dùng", Toast.LENGTH_SHORT).show();
                     }
 
-                    userAdapter = new UserAdapter(userList, showFriendButton, getContext(), new UserAdapter.OnItemClickListener() {
-                        @Override
-                        public void onOpenProfile(NguoiDung nguoiDung) {
-                            openUserProfile(nguoiDung);
-                        }
-
-                        @Override
-                        public void onSendFriendRequest(NguoiDung nguoiDung) {
-                            onSendFriend(nguoiDung);
-                        }
-
-                        @Override
-                        public void onCancelFriendRequest(NguoiDung nguoiDung) {
-                            Toast.makeText(getContext(), "Đã hủy lời mời đến: " + nguoiDung.getTenNguoiDung(), Toast.LENGTH_SHORT).show();
-                            // TODO: Gọi API hủy lời mời kết bạn nếu có
-                        }
-                    }, friendRequests, currentUserId);
+                    userAdapter = new UserAdapter(userList, getContext());
 
                     searchResultsRecyclerView.setAdapter(userAdapter);
                     userAdapter.notifyDataSetChanged();
@@ -300,41 +256,6 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
         });
     }
 
-
-    public void onSendFriend(NguoiDung nguoiDung) {
-        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
-        FriendRequest request = new FriendRequest(nguoiDung.getMaNguoiDung());
-
-        apiService.sendFriendRequest("Bearer " + authToken, request)
-                .enqueue(new Callback<LoiMoiKetBan>() {
-                    @Override
-                    public void onResponse(Call<LoiMoiKetBan> call, Response<LoiMoiKetBan> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            Toast.makeText(getContext(), "Đã gửi lời mời đến " + nguoiDung.getTenNguoiDung(), Toast.LENGTH_SHORT).show();
-                            userAdapter.updateFriendRequests(friendRequests);
-                        } else {
-                            Toast.makeText(getContext(), "Không thể gửi lời mời", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<LoiMoiKetBan> call, Throwable t) {
-                        Toast.makeText(getContext(), "Lỗi kết nối khi gửi lời mời", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void openUserProfile(NguoiDung nguoiDung) {
-        ProfileFragment profileFragment = new ProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("userId", nguoiDung.getMaNguoiDung());
-        profileFragment.setArguments(bundle);
-
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, profileFragment)
-                .addToBackStack(null)
-                .commit();
-    }
 
     private int getTopicId(String topicName) {
         switch (topicName) {

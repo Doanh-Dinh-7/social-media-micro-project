@@ -128,7 +128,6 @@ public interface ApiService {
             @Part MultipartBody.Part profileImage
     );
 
-
     @Multipart
     @PUT("users/cover")
     Call<NguoiDung> updateCoverPicture(
@@ -148,12 +147,17 @@ public interface ApiService {
     @GET("friends/requests")
     Call<List<LoiMoiKetBan>> getFriendRequest(@Header("Authorization") String token);
 
-
     @GET("notifications")
     Call<List<ThongBao>> getThongBaoBaiViet(@Header("Authorization") String token);
 
     @DELETE("friends/unfriend/{friend_id}")
     Call<Void> huyKetBan(@Header("Authorization") String token, @Path("friend_id") int friendId);
+
+    @DELETE("friends/requests/{ma_loi_moi}")
+    Call<LoiMoiKetBan> cancelFriendRequest(
+            @Header("Authorization") String token,
+            @Path("ma_loi_moi") int MaLoiMoiId
+    );
 
 }
 
