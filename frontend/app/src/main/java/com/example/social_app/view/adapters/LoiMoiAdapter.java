@@ -108,4 +108,14 @@ public class LoiMoiAdapter extends RecyclerView.Adapter<LoiMoiAdapter.LoiMoiView
             avatarImageView = itemView.findViewById(R.id.avatarImageView);
         }
     }
+    public void removeLoiMoiById(int maLoiMoi) {
+        for (int i = 0; i < loiMoiList.size(); i++) {
+            if (loiMoiList.get(i).getMaLoiMoi() == maLoiMoi) {
+                loiMoiList.remove(i);
+                notifyItemRemoved(i);
+                break;
+            }
+        }
+    }
+
 }

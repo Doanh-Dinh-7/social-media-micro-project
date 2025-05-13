@@ -16,33 +16,27 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Kiểm tra xem người dùng đã đăng nhập chưa
         if (isLoggedIn()) {
-            // Người dùng đã đăng nhập -> Mở PostActivity (hoặc HomeActivity)
             navigateToPostActivity();
         } else {
-            // Chưa đăng nhập -> Mở LoginActivity
             navigateToLoginActivity();
         }
     }
 
-    // Kiểm tra trạng thái đăng nhập
     private boolean isLoggedIn() {
         SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         return prefs.getBoolean("isLoggedIn", false);
     }
 
-    // Điều hướng tới PostActivity
     private void navigateToPostActivity() {
         Intent intent = new Intent(MainActivity.this, PostActivity.class);
         startActivity(intent);
-        finish();  // Đóng MainActivity để không quay lại
+        finish();
     }
 
-    // Điều hướng tới LoginActivity
     private void navigateToLoginActivity() {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
-        finish();  // Đóng MainActivity để không quay lại
+        finish();
     }
 }

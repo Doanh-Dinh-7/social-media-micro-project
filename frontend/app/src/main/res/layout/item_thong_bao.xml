@@ -13,7 +13,6 @@
         android:padding="8dp"
         android:gravity="center_vertical">
 
-        <!-- Avatar Image -->
         <androidx.cardview.widget.CardView
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -28,7 +27,6 @@
                 android:src="@mipmap/user_img" />
         </androidx.cardview.widget.CardView>
 
-        <!-- Nội dung và thời gian -->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="0dp"
@@ -36,7 +34,6 @@
             android:layout_weight="1"
             android:gravity="center_vertical">
 
-            <!-- Nội dung thông báo -->
             <TextView
                 android:id="@+id/noiDung"
                 android:layout_width="wrap_content"

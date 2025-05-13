@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +48,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PostFragment extends Fragment implements PostAdapter.OnPostLikeListener, PostAdapter.OnPostCommentListener {
+public class PostFragment extends Fragment implements PostAdapter.OnPostLikeListener, PostAdapter.OnPostCommentListener, PostAdapter.OnPostDeleteListener {
 
     private TabLayout tabLayout;
     private RecyclerView recyclerView, searchResultsRecyclerView;
@@ -96,7 +95,7 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         postList = new ArrayList<>();
-        postAdapter = new PostAdapter(postList, getContext(), this, this);
+        postAdapter = new PostAdapter(postList, getContext(), this, this, this);
         recyclerView.setAdapter(postAdapter);
 
         searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -311,4 +310,27 @@ public class PostFragment extends Fragment implements PostAdapter.OnPostLikeList
                 .addToBackStack(null)
                 .commit();
     }
+
+    @Override
+    public void onDeleteClicked(PostResponse post, int position) {
+        ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
+        apiService.deletePost("Bearer " + authToken, post.getMaBaiViet()).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    postList.remove(position);
+                    postAdapter.notifyItemRemoved(position);
+                    Toast.makeText(getContext(), "Đã xóa bài viết", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Không thể xóa bài viết", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi khi xóa bài viết", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }

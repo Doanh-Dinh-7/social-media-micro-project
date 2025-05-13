@@ -46,15 +46,12 @@ public class ThongBaoFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
 
-        // Ánh xạ TabLayout và ViewPager2
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
 
-        // Set adapter cho ViewPager2
         ThongBaoPagerAdapter pagerAdapter = new ThongBaoPagerAdapter(requireActivity());
         viewPager.setAdapter(pagerAdapter);
 
-        // Liên kết TabLayout và ViewPager2
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             if (position == 0) {
                 tab.setText("Bài viết");
@@ -63,7 +60,10 @@ public class ThongBaoFragment extends Fragment {
             }
         }).attach();
 
-        // Lấy token từ SharedPreferences
+        tabLayout.setTabTextColors(getResources().getColor(R.color.black),
+                getResources().getColor(R.color.orange));
+        tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.orange));
+
         SharedPreferences sharedPref = requireContext().getSharedPreferences("user_data", Context.MODE_PRIVATE);
         authToken = sharedPref.getString("auth_token", "");
 

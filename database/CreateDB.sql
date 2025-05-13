@@ -157,7 +157,7 @@ CREATE INDEX IX_ThongBao_MaNguoiDung ON ThongBao(MaNguoiDung);
 INSERT INTO QuyenRiengTu (Loai) VALUES (N'Công khai'), (N'Bạn bè'), (N'Riêng tư');
 
 -- Thêm dữ liệu mẫu cho bảng ChuDe
-INSERT INTO ChuDe (Loai) VALUES (N'Kinh nghiệm'), (N'Chia sẻ'), (N'Hỏi đáp'), (N'Giải trí');
+INSERT INTO ChuDe (Loai) VALUES (N'Kinh nghiệm'), (N'Đời sống'), (N'Hỏi đáp'), (N'Khác');
 
 GO
 

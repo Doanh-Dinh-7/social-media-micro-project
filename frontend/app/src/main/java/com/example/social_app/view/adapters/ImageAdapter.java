@@ -51,7 +51,7 @@ public class ImageAdapter extends BaseAdapter {
 
         btnRemove.setOnClickListener(v -> {
             imageUris.remove(position);
-            notifyDataSetChanged(); //
+            notifyDataSetChanged();
         });
 
         return view;

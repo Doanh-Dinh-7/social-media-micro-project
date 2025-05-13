@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,12 +74,9 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
                 break;
 
             case 3:
-                holder.btnAction.setVisibility(View.VISIBLE);
-                holder.txtTrangThai.setVisibility(View.GONE);
-                holder.btnAction.setText("Chờ phản hồi");
-                holder.btnAction.setEnabled(false);
-                holder.btnAction.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
-                holder.btnAction.setTextColor(Color.DKGRAY);
+                holder.btnAction.setVisibility(View.GONE);
+                holder.txtTrangThai.setVisibility(View.VISIBLE);
+                holder.txtTrangThai.setText("Chờ phản hồi");
                 break;
 
             case 4:
@@ -122,6 +118,9 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
     public interface FriendRequestListener {
         void onSendFriendRequest(NguoiDung nguoiDung);
         void onCancelFriendRequest(NguoiDung nguoiDung);
+    }
+    public interface OnUserClickListener {
+        void onUserClick(NguoiDung nguoiDung);
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {

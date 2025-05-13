@@ -1,15 +1,13 @@
 package com.example.social_app.model;
 
-
 public class CommentResponse {
-    private String NoiDung;  // Nội dung bình luận
-    private int MaBinhLuan;  // ID của bình luận
-    private int MaBaiViet;   // ID bài viết
-    private int MaNguoiDung; // ID người dùng
-    private String NgayTao;  // Ngày tạo bình luận
-    private String TenNguoiDung; // Tên người dùng
-
-    // Constructor, getters, setters
+    private String NoiDung;
+    private int MaBinhLuan;
+    private int MaBaiViet;
+    private int MaNguoiDung;
+    private String NgayTao;
+    private String TenNguoiDung;
+    private String AnhDaiDien;
 
     public String getNoiDung() {
         return NoiDung;
@@ -57,6 +55,13 @@ public class CommentResponse {
 
     public void setTenNguoiDung(String tenNguoiDung) {
         TenNguoiDung = tenNguoiDung;
+    }
+    public String getAnhDaiDien() {
+        return AnhDaiDien;
+    }
+
+    public void setAnhDaiDien(String anhDaiDien) {
+        AnhDaiDien = anhDaiDien;
     }
 }
 

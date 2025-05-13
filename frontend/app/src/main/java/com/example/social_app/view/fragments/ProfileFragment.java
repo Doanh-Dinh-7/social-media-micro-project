@@ -2,6 +2,7 @@ package com.example.social_app.view.fragments;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -40,6 +43,7 @@ import com.example.social_app.network.RetrofitClient;
 import com.example.social_app.view.activities.PostActivity;
 import com.example.social_app.view.adapters.ImageProfileAdapter;
 import com.example.social_app.view.adapters.PostAdapter;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
@@ -117,25 +121,23 @@ public class ProfileFragment extends Fragment {
         });
 
         btnEditCover.setOnClickListener(v -> {
-            // Open Intent to pick cover image
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            coverPicLauncher.launch(intent);  // Use the coverPicLauncher
+            coverPicLauncher.launch(intent);
         });
 
         btnEditProfilePic.setOnClickListener(v -> {
             // Open Intent to pick profile picture
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            profilePicLauncher.launch(intent);  // Use the profilePicLauncher
+            profilePicLauncher.launch(intent);
         });
 
-        // Get auth token from SharedPreferences
         SharedPreferences sharedPref = requireContext().getSharedPreferences("user_data", MODE_PRIVATE);
         authToken = sharedPref.getString("auth_token", "");
 
         recyclerViewPosts = view.findViewById(R.id.recycler_view_posts);
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        postAdapter = new PostAdapter(postList, getContext(), this::onLikeClicked, this::onCommentClicked);
+        postAdapter = new PostAdapter(postList, getContext(), this::onLikeClicked, this::onCommentClicked, this::onDeleteClicked);
         recyclerViewPosts.setAdapter(postAdapter);
 
         Bundle bundle = getArguments();
@@ -153,6 +155,7 @@ public class ProfileFragment extends Fragment {
 
         btnFriendList.setOnClickListener(v -> {
             Bundle friendBundle = new Bundle();
+            ((PostActivity) getActivity()).hideBottomNavigationView();
             friendBundle.putInt("userId", profileUserId);
             FriendListFragment friendListFragment = new FriendListFragment();
             friendListFragment.setArguments(friendBundle);
@@ -204,6 +207,8 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
+
+
 
     private void updateProfilePicture(Uri selectedImageUri) {
         if (selectedImageUri != null) {
@@ -301,9 +306,6 @@ public class ProfileFragment extends Fragment {
             return null;
         }
     }
-
-
-
 
     private void getUserInfo(int userId, String token) {
         apiService = RetrofitClient.getClient().create(ApiService.class);
@@ -475,4 +477,65 @@ public class ProfileFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
     }
+
+    public void onDeleteClicked(PostResponse post, int position) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.bottom_sheet_comment_actions, null);
+        bottomSheetDialog.setContentView(sheetView);
+
+        TextView txtDeletePost = sheetView.findViewById(R.id.btnDelete);
+
+        txtDeletePost.setOnClickListener(v -> {
+            bottomSheetDialog.dismiss();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext())
+                    .setTitle("Xác nhận xóa")
+                    .setMessage("Bạn có chắc chắn muốn xóa bài viết này không?")
+                    .setPositiveButton("Xóa", (dialog, which) -> {
+                        int postId = post.getMaBaiViet();
+                        if (postId <= 0) {
+                            Toast.makeText(getContext(), "ID bài viết không hợp lệ", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        apiService = RetrofitClient.getClient().create(ApiService.class);
+                        apiService.deletePost("Bearer " + authToken, postId).enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    postList.remove(position);
+                                    postAdapter.notifyItemRemoved(position);
+                                    txtPostCount.setText(String.valueOf(postList.size()));
+                                    Toast.makeText(getContext(), "Đã xóa bài viết", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getContext(), "Xóa thất bại: " + response.code(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    })
+                    .setNegativeButton("Hủy", (dialog, which) -> {
+                    });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            Button negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+            if (positiveButton != null) {
+                positiveButton.setTextColor(ContextCompat.getColor(getContext(), R.color.red));
+            }
+            if (negativeButton != null) {
+                negativeButton.setTextColor(ContextCompat.getColor(getContext(), R.color.gray));
+            }
+        });
+
+        bottomSheetDialog.show();
+    }
+
+
 }

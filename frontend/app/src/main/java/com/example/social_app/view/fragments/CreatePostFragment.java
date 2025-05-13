@@ -218,8 +218,7 @@ public class CreatePostFragment extends Fragment {
         View sheetView = LayoutInflater.from(getContext()).inflate(R.layout.layout_bottom_topic, null);
         bottomSheetDialog.setContentView(sheetView);
 
-        TextView txtTopic = (TextView) btnTopic.getChildAt(0); // lấy TextView bên trong CardView
-
+        TextView txtTopic = (TextView) btnTopic.getChildAt(0);
         sheetView.findViewById(R.id.optionPublic).setOnClickListener(v -> {
             selectedTopic = "Kinh nghiệm";
             txtTopic.setText(selectedTopic + " ▼");
@@ -421,13 +420,10 @@ public class CreatePostFragment extends Fragment {
     }
 
     private File resizeImage(Uri imageUri) throws IOException {
-        // Bước 1: Đọc bitmap gốc từ URI
         Bitmap originalBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imageUri);
 
-        // Bước 2: Resize ảnh
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 800, 800, true);
 
-        // Bước 3: Lưu bitmap đã resize vào file tạm
         File file = new File(getActivity().getCacheDir(), getFileName(imageUri));
         FileOutputStream out = new FileOutputStream(file);
         scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out); // nén ảnh xuống 80% chất lượng

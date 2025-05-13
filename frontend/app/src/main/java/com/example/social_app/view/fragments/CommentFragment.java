@@ -34,7 +34,6 @@ import com.example.social_app.network.ApiService;
 import com.example.social_app.network.RetrofitClient;
 import com.example.social_app.view.activities.PostActivity;
 import com.example.social_app.view.adapters.CommentAdapter;
-import com.example.social_app.view.adapters.ImageAdapter;
 import com.example.social_app.view.adapters.ImageUrlAdapter;
 
 import java.util.ArrayList;
@@ -70,7 +69,6 @@ public class CommentFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comment, container, false);
 
-        // Lấy postId từ Bundle
         if (getArguments() != null) {
             postId = getArguments().getInt("postId", -1);
         }
@@ -84,8 +82,6 @@ public class CommentFragment extends Fragment {
             }
         }
 
-
-        // Ánh xạ view
         etComment = view.findViewById(R.id.etComment);
         btnSendComment = view.findViewById(R.id.btnSendComment);
         rvComments = view.findViewById(R.id.rvComments);
@@ -97,9 +93,8 @@ public class CommentFragment extends Fragment {
         btnComment = view.findViewById(R.id.btnComment);
 
         btnComment.setOnClickListener(v -> {
-            etComment.requestFocus(); // Focus vào ô nhập bình luận
+            etComment.requestFocus();
 
-            // Mở bàn phím
             InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null) {
                 imm.showSoftInput(etComment, InputMethodManager.SHOW_IMPLICIT);
@@ -112,26 +107,21 @@ public class CommentFragment extends Fragment {
 
         btnBack = view.findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
-            requireActivity().onBackPressed(); // Quay lại Fragment trước đó trong stack
+            requireActivity().onBackPressed();
 
-            // Nếu activity là PostActivity thì hiển thị lại BottomNavigationView
             if (getActivity() instanceof PostActivity) {
                 ((PostActivity) getActivity()).showBottomNavigationView();
             }
         });
 
-
-        // Lấy token và user id
         SharedPreferences sharedPref = requireContext().getSharedPreferences("user_data", MODE_PRIVATE);
         authToken = sharedPref.getString("auth_token", "");
         currentUserId = sharedPref.getInt("user_id", -1);
 
-        // Gọi API
         apiService = RetrofitClient.getClient().create(ApiService.class);
 
-        // Cấu hình RecyclerView
         rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
-        commentAdapter = new CommentAdapter(commentList, currentUserId, new CommentAdapter.OnCommentActionListener() {
+        commentAdapter = new CommentAdapter(requireContext(), commentList, currentUserId, new CommentAdapter.OnCommentActionListener() {
             @Override
             public void onDeleteComment(CommentResponse comment) {
                 deleteComment(comment.getMaBinhLuan());
@@ -146,7 +136,6 @@ public class CommentFragment extends Fragment {
         });
         rvComments.setAdapter(commentAdapter);
 
-        // Xử lý gửi bình luận
         btnSendComment.setOnClickListener(v -> {
             String commentText = etComment.getText().toString().trim();
             if (TextUtils.isEmpty(commentText)) {
@@ -156,7 +145,6 @@ public class CommentFragment extends Fragment {
             postComment(commentText);
         });
 
-        // Load comment nếu postId hợp lệ
         if (postId != -1) {
             loadComments(postId);
             loadPostInfo(postId);
@@ -239,16 +227,15 @@ public class CommentFragment extends Fragment {
         });
     }
 
-    private PostResponse currentPost; // Biến lưu trữ bài viết hiện tại
+    private PostResponse currentPost;
 
     private void loadPostInfo(int postId) {
         apiService.getPostById("Bearer " + authToken, postId).enqueue(new Callback<PostResponse>() {
             @Override
             public void onResponse(Call<PostResponse> call, Response<PostResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    currentPost = response.body(); // Lưu bài viết vào biến toàn cục
+                    currentPost = response.body();
 
-                    // Cập nhật thông tin bài viết
                     txtContent.setText(currentPost.getNoiDung());
                     txtSoLuotTim.setText(String.valueOf(currentPost.getSo_luot_thich()));
                     txtSoBinhLuan.setText(String.valueOf(currentPost.getSo_binh_luan()));
@@ -267,17 +254,16 @@ public class CommentFragment extends Fragment {
                     }
 
                     if (currentPost.isDa_thich()) {
-                        btnLike.setImageResource(R.mipmap.redheart); // Hình ảnh khi đã thích
+                        btnLike.setImageResource(R.mipmap.redheart);
                     } else {
-                        btnLike.setImageResource(R.mipmap.heart); // Hình ảnh khi chưa thích
+                        btnLike.setImageResource(R.mipmap.heart);
                     }
 
-                    // Đặt sự kiện click cho button like
                     btnLike.setOnClickListener(v -> {
                         if (currentPost.isDa_thich()) {
-                            unlikePost(postId); // Gọi API unlike
+                            unlikePost(postId);
                         } else {
-                            likePost(postId); // Gọi API like
+                            likePost(postId);
                         }
                     });
                 } else {
@@ -348,7 +334,6 @@ public class CommentFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        // Ensure BottomNavigationView is shown when leaving the CommentFragment
         if (getActivity() instanceof PostActivity) {
             ((PostActivity) getActivity()).showBottomNavigationView();
         }

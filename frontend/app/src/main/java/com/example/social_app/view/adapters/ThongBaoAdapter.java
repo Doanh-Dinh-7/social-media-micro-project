@@ -1,5 +1,6 @@
 package com.example.social_app.view.adapters;
 
+import android.content.Context;
 import android.os.Handler;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.social_app.R;
 import com.example.social_app.model.ThongBao;
 
@@ -27,6 +29,7 @@ import java.util.TimeZone;
 public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ViewHolder> {
 
     private List<ThongBao> thongBaoList;
+    private Context context;
 
     public ThongBaoAdapter(List<ThongBao> thongBaoList) {
         this.thongBaoList = thongBaoList;
@@ -35,6 +38,7 @@ public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_thong_bao, parent, false);
         return new ViewHolder(view);
     }
@@ -46,8 +50,21 @@ public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ViewHo
         if (thongBao != null) {
 
             holder.noiDung.setText(thongBao.getNoiDung() != null ? thongBao.getNoiDung() : "Không có nội dung");
-            holder.imgAvatar.setImageResource(R.mipmap.user_img);
-            holder.bindTime(thongBao.getThoiGian()); // gọi đúng chỗ này
+
+            String avatarUrl = thongBao.getAnhDaiDien();
+
+            if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                Glide.with(context)
+                        .load(avatarUrl)
+                        .placeholder(R.mipmap.user_img)
+                        .into(holder.imgAvatar);
+            } else {
+                holder.imgAvatar.setImageResource(R.mipmap.user_img);
+            }
+
+
+
+            holder.bindTime(thongBao.getThoiGian());
         }
     }
 

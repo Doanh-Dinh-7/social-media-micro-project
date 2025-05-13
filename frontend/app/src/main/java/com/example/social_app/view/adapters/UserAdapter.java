@@ -40,7 +40,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         Glide.with(context)
                 .load(user.getAnhDaiDien())
-                .placeholder(R.mipmap.user_img) // placeholder khi ảnh đang tải
+                .placeholder(R.mipmap.user_img)
                 .into(holder.imgAvatar);
     }
 

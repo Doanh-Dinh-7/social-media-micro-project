@@ -26,9 +26,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.currentUserId = currentUserId;
     }
 
-    public void setCurrentUserId(int userId) {
-        this.currentUserId = userId;
-    }
 
     @Override
     public int getItemViewType(int position) {

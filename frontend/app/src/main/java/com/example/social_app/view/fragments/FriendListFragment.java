@@ -28,6 +28,7 @@ import com.example.social_app.model.NguoiDung;
 import com.example.social_app.model.UserInfoResponse;
 import com.example.social_app.network.ApiService;
 import com.example.social_app.network.RetrofitClient;
+import com.example.social_app.view.activities.PostActivity;
 import com.example.social_app.view.adapters.FriendListAdapter;
 
 import java.util.ArrayList;
@@ -66,8 +67,24 @@ public class FriendListFragment extends Fragment {
         btnBack = view.findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(v -> {
+            ((PostActivity) getActivity()).showBottomNavigationView();
             FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, new ProfileFragment());
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
+
+        adapter.setOnItemClickListener(friend -> {
+            int receiverId = friend.getBan().getMaNguoiDung();
+            ((PostActivity) getActivity()).hideBottomNavigationView();
+
+            MessageFragment messageFragment = new MessageFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("user_id", receiverId);
+            messageFragment.setArguments(bundle);
+
+            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, messageFragment);
             transaction.addToBackStack(null);
             transaction.commit();
         });

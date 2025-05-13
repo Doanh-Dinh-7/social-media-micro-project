@@ -34,7 +34,6 @@ public class UserInforFragment extends Fragment {
     private String token;
 
     public UserInforFragment() {
-        // Required empty public constructor
     }
 
     @Nullable
@@ -42,22 +41,18 @@ public class UserInforFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_infor, container, false);
 
-        // Ánh xạ view
         btnBack = view.findViewById(R.id.btn_Back);
         btnContinue = view.findViewById(R.id.btn_continue);
         etUsername = view.findViewById(R.id.et_username);
         etDob = view.findViewById(R.id.et_dob);
         etGender = view.findViewById(R.id.et_gender);
 
-        // Nhận token từ Bundle
         if (getArguments() != null) {
             token = getArguments().getString("TOKEN", "");
         }
 
-        // Xử lý sự kiện quay lại
         btnBack.setOnClickListener(v -> ((RegisterActivity) getActivity()).goToSuccess());
 
-        // Xử lý sự kiện nút Tiếp tục
         btnContinue.setOnClickListener(v -> {
             String username = etUsername.getText().toString().trim();
             if (username.isEmpty()) {
@@ -69,12 +64,11 @@ public class UserInforFragment extends Fragment {
             Toast.makeText(getActivity(), "Xác nhận thành công!", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.putExtra("TOKEN", token);  // Dùng token nhận từ Bundle
+            intent.putExtra("TOKEN", token);
             startActivity(intent);
             getActivity().finish();
         });
 
-        // Gán sự kiện nhập liệu
         TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -92,10 +86,8 @@ public class UserInforFragment extends Fragment {
         etDob.addTextChangedListener(textWatcher);
         etGender.addTextChangedListener(textWatcher);
 
-        // Xử lý chọn ngày sinh
         etDob.setOnClickListener(v -> showDatePicker());
 
-        // Xử lý chọn giới tính
         etGender.setOnClickListener(v -> showGenderDialog());
 
         return view;
@@ -107,19 +99,16 @@ public class UserInforFragment extends Fragment {
         new android.app.AlertDialog.Builder(requireContext())
                 .setTitle("Chọn giới tính")
                 .setItems(genderOptions, (dialog, which) -> {
-                    // Cập nhật giá trị giới tính vào TextInputEditText
                     etGender.setText(genderOptions[which]);
                 })
                 .show();
     }
 
-    // Cập nhật trạng thái của nút tiếp tục
     private void updateButtonState() {
         String username = etUsername.getText().toString().trim();
         String dob = etDob.getText().toString().trim();
         String gender = etGender.getText().toString().trim();
 
-        // Nếu tất cả các trường đều có giá trị hợp lệ, thì enable nút "Xác nhận"
         if (!username.isEmpty() && !dob.isEmpty() && !gender.isEmpty()) {
             btnContinue.setEnabled(true);
             btnContinue.setText("Xác nhận");

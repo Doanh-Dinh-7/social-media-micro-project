@@ -14,7 +14,9 @@ import com.example.social_app.model.NguoiDung;
 import com.example.social_app.model.PostResponse;
 import com.example.social_app.model.RegisterRequest;
 import com.example.social_app.model.RegisterResponse;
+import com.example.social_app.model.SuggestionsResponse;
 import com.example.social_app.model.ThongBao;
+import com.example.social_app.model.TrangThaiRequest;
 import com.example.social_app.model.UpdateUserRequest;
 import com.example.social_app.model.UserInfoResponse;
 
@@ -157,6 +159,19 @@ public interface ApiService {
     Call<LoiMoiKetBan> cancelFriendRequest(
             @Header("Authorization") String token,
             @Path("ma_loi_moi") int MaLoiMoiId
+    );
+
+    @DELETE("posts/{post_id}")
+    Call<Void> deletePost(@Header("Authorization") String token, @Path("post_id") int postId);
+
+    @GET("friends/suggestions")
+    Call<SuggestionsResponse> getFriendSuggestions(@Header("Authorization") String authToken);
+
+    @PUT("friends/requests/{ma_loi_moi}")
+    Call<Void> respondToFriendRequest(
+            @Path("ma_loi_moi") int maLoiMoi,
+            @Body TrangThaiRequest request,
+            @Header("Authorization") String token
     );
 
 }

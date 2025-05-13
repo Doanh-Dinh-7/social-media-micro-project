@@ -29,14 +29,11 @@ public class RegisterActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
 
-
-
         if (savedInstanceState == null) {
             loadFragment(new RegisterFragment());
         }
     }
 
-    // Hàm chuyển đổi giữa các Fragment
     public void loadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
@@ -67,8 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Lưu token sau khi đăng ký thành công
-                    String token = response.body().getAccessToken(); // Đảm bảo rằng getAccessToken() trả về token đúng
+                    String token = response.body().getAccessToken();
                     getSharedPreferences("MyPrefs", MODE_PRIVATE)
                             .edit()
                             .putString("TOKEN", token)  // Lưu token
@@ -76,7 +72,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                     Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
 
-                    // Chuyển sang SuccessFragment
                     goToSuccess();
                 } else {
                     Toast.makeText(RegisterActivity.this, "Đăng ký thất bại!", Toast.LENGTH_SHORT).show();

@@ -14,7 +14,6 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <!-- Thông tin người đăng -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -120,12 +119,12 @@
                 android:layout_weight="1" />
 
             <ImageView
+                android:id="@+id/btnDelete"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@mipmap/more" />
         </LinearLayout>
 
-        <!-- Nội dung bài đăng -->
         <TextView
             android:id="@+id/txtContent"
             android:layout_width="match_parent"
@@ -146,7 +145,6 @@
             android:verticalSpacing="10dp"
             android:visibility="gone" />
 
-        <!-- Nút tương tác -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -48,7 +48,6 @@ public class BaiVietThongBaoFragment extends Fragment {
         adapter = new ThongBaoAdapter(thongBaoList);
         recyclerView.setAdapter(adapter);
 
-        // Lấy token từ SharedPreferences
         SharedPreferences sharedPref = requireContext().getSharedPreferences("user_data", Context.MODE_PRIVATE);
         authToken = sharedPref.getString("auth_token", "");
 

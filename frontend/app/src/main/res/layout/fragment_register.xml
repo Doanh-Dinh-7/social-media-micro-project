@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,7 +14,6 @@
         android:scaleType="centerInside"
         android:src="@mipmap/back" />
 
-    <!-- Tiêu đề -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,7 +47,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Ô nhập email -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,8 +68,6 @@
                         android:paddingStart="48dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-
-                <!-- Ô nhập mật khẩu -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -95,7 +90,6 @@
                         android:paddingStart="48dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Ô nhập xác nhận mật khẩu -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -118,7 +112,6 @@
                         android:paddingStart="48dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Checkbox điều khoản -->
                 <CheckBox
                     android:id="@+id/cb_terms"
                     android:layout_width="match_parent"
@@ -140,11 +133,6 @@
             android:text="Tiếp tục"
             android:textColor="@android:color/white" />
     </LinearLayout>
-
-    <!-- Layout chứa form đăng ký -->
-
-    <!-- Nút tiếp tục -->
-
 
 </FrameLayout>
 

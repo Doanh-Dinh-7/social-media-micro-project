@@ -60,7 +60,6 @@
             app:srcCompat="@mipmap/mess" />
     </LinearLayout>
 
-    <!-- Search Results Header -->
     <LinearLayout
         android:id="@+id/layout_search_header"
         android:layout_width="match_parent"
@@ -94,7 +93,6 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- RecyclerView for Search Results -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchResultsRecyclerView"
         android:layout_width="match_parent"
@@ -103,7 +101,6 @@
         android:visibility="gone"
         android:layout_marginTop="10dp"/>
 
-    <!-- Tab Layout for Topics -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
@@ -115,7 +112,6 @@
         app:tabSelectedTextColor="#ffbe64"
         app:tabTextColor="@android:color/black" />
 
-    <!-- RecyclerView for Posts -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

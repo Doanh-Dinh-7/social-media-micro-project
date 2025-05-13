@@ -12,6 +12,4 @@
         android:scrollbars="vertical"
         android:clipToPadding="false"/>
 
-
-
 </LinearLayout>

@@ -24,7 +24,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+// ... package và import không đổi
+
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
+    private Context context;
     private List<CommentResponse> commentList;
     private int currentUserId;
     private OnCommentActionListener listener;
@@ -34,7 +37,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         void onCommentCountChanged(int count);
     }
 
-    public CommentAdapter(List<CommentResponse> commentList, int currentUserId, OnCommentActionListener listener) {
+    public CommentAdapter(Context context, List<CommentResponse> commentList, int currentUserId, OnCommentActionListener listener) {
+        this.context = context;
         this.commentList = commentList;
         this.currentUserId = currentUserId;
         this.listener = listener;
@@ -53,9 +57,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
         holder.txtUserName.setText(comment.getTenNguoiDung());
         holder.txtCommentContent.setText(comment.getNoiDung());
-        holder.txtCommentTime.setText(getTimeAgo(comment.getNgayTao()));
         holder.bindTime(comment.getNgayTao());
 
+        Glide.with(context)
+                .load(comment.getAnhDaiDien())
+                .placeholder(R.mipmap.user_img)
+                .into(holder.imgAvatar);
 
         holder.itemView.setOnLongClickListener(v -> {
             if (comment.getMaNguoiDung() == currentUserId) {
@@ -65,12 +72,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         });
     }
 
+    @Override
+    public void onViewRecycled(@NonNull CommentViewHolder holder) {
+        holder.unbind();
+        super.onViewRecycled(holder);
+    }
+
     private void showBottomSheet(Context context, CommentResponse comment) {
         BottomSheetDialog dialog = new BottomSheetDialog(context);
         View view = LayoutInflater.from(context).inflate(R.layout.bottom_sheet_comment_actions, null);
 
         TextView btnDelete = view.findViewById(R.id.btnDelete);
-
         btnDelete.setOnClickListener(v -> {
             listener.onDeleteComment(comment);
             dialog.dismiss();
@@ -99,30 +111,31 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             txtCommentTime = itemView.findViewById(R.id.txtCommentTime);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
         }
+
         public void bindTime(String ngayTao) {
             originalTime = ngayTao;
-            updateTime(); // Gọi lần đầu
+            updateTime();
 
-            if (timeUpdater != null) {
-                handler.removeCallbacks(timeUpdater);
-            }
+            if (timeUpdater != null) handler.removeCallbacks(timeUpdater);
 
-            timeUpdater = new Runnable() {
-                @Override
-                public void run() {
-                    updateTime();
-                    handler.postDelayed(this, 60000); // Cập nhật sau mỗi phút
-                }
+            timeUpdater = () -> {
+                updateTime();
+                handler.postDelayed(timeUpdater, 60000);
             };
             handler.postDelayed(timeUpdater, 60000);
+        }
+
+        public void unbind() {
+            if (timeUpdater != null) {
+                handler.removeCallbacks(timeUpdater);
+                timeUpdater = null;
+            }
         }
 
         private void updateTime() {
             txtCommentTime.setText(CommentAdapter.getTimeAgo(originalTime));
         }
-
     }
-
 
     public void setCommentList(List<CommentResponse> newCommentList) {
         this.commentList = newCommentList;
@@ -138,23 +151,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             Date commentDate = sdf.parse(isoTime);
             long now = System.currentTimeMillis();
             long time = commentDate.getTime();
-
             long diff = now - time;
 
             if (diff < DateUtils.MINUTE_IN_MILLIS) {
                 return "Vừa xong";
             } else if (diff < DateUtils.HOUR_IN_MILLIS) {
-                long minutes = diff / DateUtils.MINUTE_IN_MILLIS;
-                return minutes + " phút trước";
+                return (diff / DateUtils.MINUTE_IN_MILLIS) + " phút trước";
             } else if (diff < DateUtils.DAY_IN_MILLIS) {
-                long hours = diff / DateUtils.HOUR_IN_MILLIS;
-                return hours + " giờ trước";
+                return (diff / DateUtils.HOUR_IN_MILLIS) + " giờ trước";
             } else if (diff < 2 * DateUtils.DAY_IN_MILLIS) {
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                return "Hôm qua lúc " + timeFormat.format(commentDate);
+                return "Hôm qua lúc " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(commentDate);
             } else {
-                SimpleDateFormat fullFormat = new SimpleDateFormat("dd 'Tháng' MM 'lúc' HH:mm", Locale.getDefault());
-                return fullFormat.format(commentDate);
+                return new SimpleDateFormat("dd 'Tháng' MM 'lúc' HH:mm", Locale.getDefault()).format(commentDate);
             }
 
         } catch (ParseException e) {

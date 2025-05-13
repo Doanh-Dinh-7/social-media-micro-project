@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +44,7 @@ public class SearchFragment extends Fragment {
 
     private RecyclerView searchResultsRecyclerView;
     private UserSearchAdapter userSearchAdapter;
-    private UserAdapter userAdapter; // Thêm biến userAdapter
+    private UserAdapter userAdapter;
     private List<NguoiDung> userList;
     private String authToken;
     private int currentUserId;
@@ -67,6 +66,7 @@ public class SearchFragment extends Fragment {
 
         SharedPreferences sharedPref = requireContext().getSharedPreferences("user_data", MODE_PRIVATE);
         authToken = sharedPref.getString("auth_token", "");
+        currentUserId = sharedPref.getInt("user_id", -1);
 
         String keyword = getArguments().getString("keyword");
         if (keyword != null) {
@@ -184,9 +184,10 @@ public class SearchFragment extends Fragment {
                     LoiMoiKetBan loiMoi = response.body();
                     int maLoiMoi = loiMoi.getMaLoiMoi();
 
+                    String key = "maLoiMoi_" + currentUserId + "_" + nguoiDung.getMaNguoiDung();
                     SharedPreferences preferences = getContext().getSharedPreferences("FriendRequests", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt("maLoiMoi_" + nguoiDung.getMaNguoiDung(), maLoiMoi); // Lưu mã lời mời theo ID người dùng
+                    editor.putInt(key, maLoiMoi);
                     editor.apply();
 
                     userSearchAdapter.updateUserStatus(nguoiDung, 2);
@@ -205,9 +206,9 @@ public class SearchFragment extends Fragment {
 
 
     public void cancelFriendRequest(NguoiDung nguoiDung) {
-        // Lấy mã lời mời từ SharedPreferences theo người dùng
         SharedPreferences preferences = getContext().getSharedPreferences("FriendRequests", Context.MODE_PRIVATE);
-        int maLoiMoi = preferences.getInt("maLoiMoi_" + nguoiDung.getMaNguoiDung(), -1);
+        String key = "maLoiMoi_" + currentUserId + "_" + nguoiDung.getMaNguoiDung();
+        int maLoiMoi = preferences.getInt(key, -1);
 
         if (maLoiMoi != -1) {
             ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
@@ -216,7 +217,6 @@ public class SearchFragment extends Fragment {
                         @Override
                         public void onResponse(Call<LoiMoiKetBan> call, Response<LoiMoiKetBan> response) {
                             if (response.isSuccessful() && response.body() != null) {
-                                // Cập nhật trạng thái UI sau khi hủy lời mời
                                 userSearchAdapter.updateUserStatus(nguoiDung, 4);
                                 Toast.makeText(getContext(), "Đã hủy lời mời kết bạn", Toast.LENGTH_SHORT).show();
                             } else {
@@ -261,6 +261,3 @@ public class SearchFragment extends Fragment {
         });
     }
 }
-
-
-

@@ -49,7 +49,6 @@
         </androidx.cardview.widget.CardView>
     </LinearLayout>
 
-    <!-- Tiêu đề mặc định: Mọi người -->
     <TextView
         android:id="@+id/txtMoiNguoi"
         android:layout_width="match_parent"
@@ -95,7 +94,6 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Danh sách kết quả -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchResultsRecyclerView"
         android:layout_width="match_parent"

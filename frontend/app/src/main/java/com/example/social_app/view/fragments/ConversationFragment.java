@@ -51,19 +51,16 @@ public class ConversationFragment extends Fragment implements ConversationAdapte
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_conversation, container, false);
 
-        // Ánh xạ View
         recyclerView = view.findViewById(R.id.recycler_view_conversations);
         tabLayout = view.findViewById(R.id.tabLayout);
         btnBack = view.findViewById(R.id.btnBack);
         edtSearch = view.findViewById(R.id.edt_search);
 
-        // Setup RecyclerView
         conversationList = new ArrayList<>();
         conversationAdapter = new ConversationAdapter(conversationList, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(conversationAdapter);
 
-        // Setup TabLayout
         tabLayout.addTab(tabLayout.newTab().setText("Quan trọng"));
         tabLayout.addTab(tabLayout.newTab().setText("Khác"));
 
@@ -83,7 +80,6 @@ public class ConversationFragment extends Fragment implements ConversationAdapte
             @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
 
-        // Button back
         btnBack.setOnClickListener(v -> {
             requireActivity().onBackPressed();
             if (getActivity() instanceof PostActivity) {
@@ -96,7 +92,7 @@ public class ConversationFragment extends Fragment implements ConversationAdapte
         currentUserId = sharedPreferences.getInt("user_id", -1);
 
         if (authToken != null && !authToken.isEmpty()) {
-            apiService = RetrofitClient.getClient().create(ApiService.class); // Nếu dự án bạn là getClient()
+            apiService = RetrofitClient.getClient().create(ApiService.class);
             loadConversationsFromApi();
         } else {
             Toast.makeText(requireContext(), "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
@@ -161,7 +157,6 @@ public class ConversationFragment extends Fragment implements ConversationAdapte
             });
         }
     }
-
 
     @Override
     public void onConversationClick(CuocTroChuyen conversation) {

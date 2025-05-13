@@ -5,21 +5,24 @@ import com.google.gson.annotations.SerializedName;
 public class ThongBao {
     private int maThongBao;
     private int maNguoiDung;
-    @SerializedName("NoiDung")
-    private String noiDung;
-    @SerializedName("ThoiGian")
-    private String thoiGian;
+
+    private String NoiDung;
+    private String ThoiGian;
     private boolean daDoc;
+    private int maBaiViet;
+    private String AnhDaiDien;
 
     public ThongBao() {
     }
 
-    public ThongBao(int maThongBao, int maNguoiDung, String noiDung, String thoiGian, boolean daDoc) {
+    public ThongBao(int maThongBao, int maNguoiDung, String NoiDung, String ThoiGian, boolean daDoc, int maBaiViet, String AnhDaiDien) {
         this.maThongBao = maThongBao;
         this.maNguoiDung = maNguoiDung;
-        this.noiDung = noiDung;
-        this.thoiGian = thoiGian;
+        this.NoiDung = NoiDung;
+        this.ThoiGian = ThoiGian;
         this.daDoc = daDoc;
+        this.maBaiViet = maBaiViet;
+        this.AnhDaiDien = AnhDaiDien;
     }
 
     public int getMaThongBao() {
@@ -39,19 +42,19 @@ public class ThongBao {
     }
 
     public String getNoiDung() {
-        return noiDung;
+        return NoiDung;
     }
 
-    public void setNoiDung(String noiDung) {
-        this.noiDung = noiDung;
+    public void setNoiDung(String NoiDung) {
+        this.NoiDung = NoiDung;
     }
 
     public String getThoiGian() {
-        return thoiGian;
+        return ThoiGian;
     }
 
-    public void setThoiGian(String thoiGian) {
-        this.thoiGian = thoiGian;
+    public void setThoiGian(String ThoiGian) {
+        this.ThoiGian = ThoiGian;
     }
 
     public boolean isDaDoc() {
@@ -60,4 +63,20 @@ public class ThongBao {
 
     public void setDaDoc(boolean daDoc) {
         this.daDoc = daDoc;
+    }
+
+    public int getMaBaiViet() {
+        return maBaiViet;
+    }
+
+    public void setMaBaiViet(int maBaiViet) {
+        this.maBaiViet = maBaiViet;
+    }
+
+    public String getAnhDaiDien() {
+        return AnhDaiDien;
+    }
+
+    public void setAnhDaiDien(String AnhDaiDien) {
+        this.AnhDaiDien = AnhDaiDien;
     }}

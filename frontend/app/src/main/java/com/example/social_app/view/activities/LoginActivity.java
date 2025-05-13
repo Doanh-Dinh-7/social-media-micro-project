@@ -32,7 +32,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
 
-        // Mở màn hình chọn phương thức đăng nhập mặc định
         if (savedInstanceState == null) {
             loadFragment(new LoginOptionsFragment());
         }
@@ -46,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
                 .commit();
     }
 
-    // Chuyển đến màn hình nhập tài khoản
     public void goToLoginForm() {
         loadFragment(new LoginFormFragment());
     }
@@ -63,15 +61,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Kiểm tra nếu access_token và user tồn tại
                     String accessToken = response.body().getAccessToken();
                     NguoiDung user = response.body().getUser();
 
                     if (accessToken != null && !accessToken.isEmpty() && user != null) {
-                        // Lấy userId từ đối tượng NguoiDung
                         int userId = user.getMaNguoiDung();
 
-                        // Lưu token và userId vào SharedPreferences
                         getSharedPreferences("user_data", MODE_PRIVATE).edit()
                                 .putString("auth_token", accessToken)
                                 .putInt("user_id", userId)
@@ -80,15 +75,13 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("DEBUG_LOGIN", "User ID nhận được: " + userId);
 
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                        // Chuyển sang MainActivity
                         Intent intent = new Intent(LoginActivity.this, PostActivity.class);
                         startActivity(intent);
-                        finish(); // Đóng màn hình đăng nhập
+                        finish();
                     } else {
                         Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    // Xử lý trường hợp API trả về mã lỗi
                     if (response.code() == 401) {
                         Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
                     } else {

@@ -35,18 +35,14 @@ public class PostActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
 
-            // Xử lý sự kiện khi chọn mục Home (Trang chủ)
             if (item.getItemId() == R.id.nav_home) {
                 selectedFragment = new PostFragment();
             }
-            // Xử lý sự kiện khi chọn mục Create Post
             else if (item.getItemId() == R.id.nav_post) {
                 selectedFragment = new CreatePostFragment();
             }
-            // Nếu có thêm mục khác thì thêm ở đây
             else if (item.getItemId() == R.id.nav_notification) {
                 selectedFragment = new ThongBaoFragment();
-                // Xử lý thông báo
             } else if (item.getItemId() == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
             }
@@ -65,7 +61,6 @@ public class PostActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
 
-        // Kiểm tra nếu là CreatePostFragment thì ẩn BottomNavigationView
         if (fragment instanceof CreatePostFragment) {
             bottomNavigationView.setVisibility(View.GONE);
         } else {
@@ -83,15 +78,12 @@ public class PostActivity extends AppCompatActivity {
                     .replace(R.id.fragment_container, new PostFragment())
                     .commit();
 
-            // Cập nhật thanh điều hướng về Home và HIỆN NÓ LÊN
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
             bottomNavigationView.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
     }
-
-
 
     public void hideBottomNavigationView() {
         bottomNavigationView.setVisibility(View.GONE);

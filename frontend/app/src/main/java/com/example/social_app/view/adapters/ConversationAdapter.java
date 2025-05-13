@@ -63,12 +63,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             holder.imgAvatar.setImageResource(R.mipmap.user_img);
         }
 
-        // Binding time for each item
         holder.bindTime(conversation.getThoi_gian_cuoi());
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onConversationClick(conversation); // Sửa ở đây, truyền toàn bộ đối tượng conversation
+                listener.onConversationClick(conversation);
             }
         });
     }
@@ -96,24 +95,24 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
         public void bindTime(String ngayTao) {
             originalTime = ngayTao;
-            updateTime(); // Call initially to set time
+            updateTime();
 
             if (timeUpdater != null) {
-                handler.removeCallbacks(timeUpdater); // Clear previous handler if exists
+                handler.removeCallbacks(timeUpdater);
             }
 
             timeUpdater = new Runnable() {
                 @Override
                 public void run() {
                     updateTime();
-                    handler.postDelayed(this, 60000); // Update every minute
+                    handler.postDelayed(this, 60000);
                 }
             };
             handler.postDelayed(timeUpdater, 60000);
         }
 
         private void updateTime() {
-            txtTime.setText(ConversationAdapter.getTimeAgo(originalTime)); // Correct reference to ConversationAdapter
+            txtTime.setText(ConversationAdapter.getTimeAgo(originalTime));
         }
     }
 

@@ -109,9 +109,6 @@
             android:buttonTint="#FFA726"/>
     </LinearLayout>
 
-    <!-- Checkbox -->
-
-    <!-- Button Áp dụng -->
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"

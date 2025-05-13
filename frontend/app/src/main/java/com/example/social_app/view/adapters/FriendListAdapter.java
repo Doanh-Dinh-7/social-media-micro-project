@@ -26,8 +26,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.ViewHolder> {
+
     private List<FriendResponse> list;
     private Context context;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(FriendResponse friend);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public FriendListAdapter(List<FriendResponse> list, Context context) {
         this.list = list;
@@ -46,12 +56,20 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
         FriendResponse friend = list.get(position);
         NguoiDung nguoiDung = friend.getBan();
 
+        if (nguoiDung == null) return;
+
         holder.txtName.setText(nguoiDung.getTenNguoiDung());
 
         Glide.with(context)
                 .load(nguoiDung.getAnhDaiDien())
                 .placeholder(R.mipmap.user_img)
                 .into(holder.imgAvatar);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(friend);
+            }
+        });
 
         holder.txtHuyKB.setOnClickListener(v -> {
             int friendId = nguoiDung.getMaNguoiDung();

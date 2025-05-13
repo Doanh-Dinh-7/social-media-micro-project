@@ -30,14 +30,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     private List<PostResponse> postList;
     private Context context;
     private OnPostLikeListener likeListener;
-
     private OnPostCommentListener commentListener;
+    private OnPostDeleteListener deleteListener;
 
-    public PostAdapter(List<PostResponse> postList, Context context, OnPostLikeListener likeListener, OnPostCommentListener commentListener) {
+    public PostAdapter(List<PostResponse> postList, Context context,
+                       OnPostLikeListener likeListener,
+                       OnPostCommentListener commentListener,
+                       OnPostDeleteListener deleteListener) {
         this.postList = postList;
         this.context = context;
         this.likeListener = likeListener;
         this.commentListener = commentListener;
+        this.deleteListener = deleteListener;
     }
 
     @NonNull
@@ -65,7 +69,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.user_image.setImageResource(R.mipmap.user_img);
         }
 
-
         int maRiengTu = post.getMaQuyenRiengTu();
 
         switch (maRiengTu) {
@@ -79,14 +82,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
                 holder.imgPrivacyIcon.setImageResource(R.mipmap.ic_lock);
                 break;
             default:
-                holder.imgPrivacyIcon.setVisibility(View.GONE); // không hiển thị nếu không xác định
+                holder.imgPrivacyIcon.setVisibility(View.GONE);
                 break;
         }
 
-        int maChuDe = post.getMaChuDe();  // Kiểu int
+        int maChuDe = post.getMaChuDe();
         String tenChuDe = "";
 
-// Gán tên chủ đề theo mã
         switch (maChuDe) {
             case 1:
                 tenChuDe = "Kinh nghiệm";
@@ -107,17 +109,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
         Log.d("PostAdapter", "maChuDe = " + maChuDe + " => tenChuDe = " + tenChuDe);
 
-
         holder.txtContent.setText(post.getNoiDung());
         holder.txtChuDe.setText(tenChuDe);
-
-        String userName = post.getNguoi_dung().getTenNguoiDung();  // Make sure this getter method exists
-
-        // Set the user's name dynamically
-        holder.txtTen.setText(userName);
+        holder.txtTen.setText(post.getNguoi_dung().getTenNguoiDung());
 
         List<HinhAnh> hinh_anh = post.getHinh_anh();
-
         if (hinh_anh != null && !hinh_anh.isEmpty()) {
             holder.gridSelectedImages.setVisibility(View.VISIBLE);
             ImageUrlAdapter imageAdapter = new ImageUrlAdapter(context, hinh_anh);
@@ -127,19 +123,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
 
         holder.txtSoLuotTim.setText(String.valueOf(post.getSo_luot_thich()));
-
-        boolean daThich = post.isDa_thich();
-        holder.btnLike.setImageResource(daThich ? R.mipmap.redheart : R.mipmap.heart);
-
-        holder.btnLike.setOnClickListener(v -> {
-            likeListener.onLikeClicked(post, position);
-        });
-
-        holder.btnComment.setOnClickListener(v -> {
-            commentListener.onCommentClicked(post, position);
-        });
-
+        holder.btnLike.setImageResource(post.isDa_thich() ? R.mipmap.redheart : R.mipmap.heart);
+        holder.btnLike.setOnClickListener(v -> likeListener.onLikeClicked(post, position));
+        holder.btnComment.setOnClickListener(v -> commentListener.onCommentClicked(post, position));
         holder.txtSoBinhLuan.setText(String.valueOf(post.getSo_binh_luan()));
+
+        holder.btnDelete.setVisibility(View.VISIBLE);
+        holder.btnDelete.setOnClickListener(v -> deleteListener.onDeleteClicked(post, position));
     }
 
     public interface OnPostLikeListener {
@@ -150,11 +140,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         void onCommentClicked(PostResponse post, int position);
     }
 
+    public interface OnPostDeleteListener {
+        void onDeleteClicked(PostResponse post, int position);
+    }
 
     @Override
     public int getItemCount() {
         return postList.size();
     }
+
     public static String getTimeAgo(String isoTime) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
         try {
@@ -187,17 +181,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     }
 
     public static class PostViewHolder extends RecyclerView.ViewHolder {
-        TextView txtContent;
-        TextView txtChuDe;
+        TextView txtContent, txtChuDe, txtSoLuotTim, txtSoBinhLuan, txtTen, txtThoiGian;
         GridView gridSelectedImages;
-        ImageView btnLike;
-        TextView txtSoLuotTim;
-        TextView txtSoBinhLuan;
-        ImageView btnComment;
-        TextView txtTen;
-        ImageView imgPrivacyIcon;
-        TextView txtThoiGian;
-        ImageView user_image;
+        ImageView btnLike, btnComment, imgPrivacyIcon, user_image, btnDelete;
 
         private final Handler handler = new Handler();
         private Runnable timeUpdater;
@@ -216,6 +202,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             imgPrivacyIcon = itemView.findViewById(R.id.imgPrivacyIcon);
             txtThoiGian = itemView.findViewById(R.id.txtThoiGian);
             user_image = itemView.findViewById(R.id.imgAvatar);
+            btnDelete = itemView.findViewById(R.id.btnDelete); // nút xóa
         }
 
         public void bindTime(String ngayTao) {

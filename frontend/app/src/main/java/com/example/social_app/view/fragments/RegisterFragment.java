@@ -30,9 +30,7 @@ public class RegisterFragment extends Fragment {
     private TextInputEditText edtEmail, edtPassword, etConfirmPassword;
 
 
-    // Constructor rỗng (bắt buộc cho Fragment)
     public RegisterFragment() {
-        // Required empty public constructor
     }
 
     @Nullable
@@ -46,7 +44,6 @@ public class RegisterFragment extends Fragment {
 
         btnContinue = view.findViewById(R.id.btn_continue);
 
-//        btnContinue.setOnClickListener(v -> ((RegisterActivity) getActivity()).goToSuccess());
         btnContinue.setOnClickListener(v -> {
             String email = edtEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
@@ -57,7 +54,7 @@ public class RegisterFragment extends Fragment {
                 return;
             }
 
-            // Thêm log để debug
+
             Log.d("DEBUG", "Email: " + email);
             Log.d("DEBUG", "Password: " + password);
 
@@ -67,10 +64,7 @@ public class RegisterFragment extends Fragment {
                 }
         });
 
-//        ((RegisterActivity) getActivity()).registerUser("", edtEmail.toString(), edtPassword.toString()));
 
-
-        // Ánh xạ view
         btnContinue = view.findViewById(R.id.btn_continue);
         edtEmail = view.findViewById(R.id.edtEmail);
         edtPassword = view.findViewById(R.id.edtPassword);
@@ -93,7 +87,6 @@ public class RegisterFragment extends Fragment {
             }
         };
 
-        // Gán sự kiện nhập liệu
         edtEmail.addTextChangedListener(textWatcher);
         edtPassword.addTextChangedListener(textWatcher);
         etConfirmPassword.addTextChangedListener(textWatcher);

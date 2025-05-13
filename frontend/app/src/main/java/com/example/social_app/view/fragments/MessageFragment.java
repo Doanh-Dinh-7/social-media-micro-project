@@ -61,7 +61,7 @@ public class MessageFragment extends Fragment {
     private WebSocket webSocket;
     private final Gson gson = new Gson();
 
-    private static final String SOCKET_BASE_URL = "ws://172.16.2.123:8000/api/messages/"; // WebSocket URL base
+    private static final String SOCKET_BASE_URL = "ws://172.40.172.247:8000/api/messages/";
 
     public MessageFragment() {}
 
@@ -84,7 +84,7 @@ public class MessageFragment extends Fragment {
         currentUserId = sharedPref.getInt("user_id", -1);
 
         if (getArguments() != null) {
-            userId = getArguments().getInt("user_id", -1); // người nhận
+            userId = getArguments().getInt("user_id", -1);
             conversationId = getArguments().getInt("conversation_id", 0);
         }
 
@@ -97,7 +97,7 @@ public class MessageFragment extends Fragment {
 
         loadMessages();
         getUserInfo(userId, authToken);
-        initWebSocket();  // Ensure WebSocket is initialized when fragment is created
+        initWebSocket();
 
         btnSend.setOnClickListener(v -> sendMessage());
 
@@ -152,7 +152,7 @@ public class MessageFragment extends Fragment {
 
     private void initWebSocket() {
         OkHttpClient client = new OkHttpClient();
-        String socketUrl = SOCKET_BASE_URL + currentUserId; // Formatted URL with currentUserId
+        String socketUrl = SOCKET_BASE_URL + currentUserId;
         Request request = new Request.Builder()
                 .url(socketUrl)
                 .build();
@@ -199,12 +199,10 @@ public class MessageFragment extends Fragment {
             return;
         }
 
-        // Gửi nội dung qua WebSocket bằng định dạng đúng
-        MessageToSend messageToSend = new MessageToSend(content, userId);  // userId là người nhận
+        MessageToSend messageToSend = new MessageToSend(content, userId);
         String messageJson = gson.toJson(messageToSend);
         webSocket.send(messageJson);
 
-        // Hiển thị tin nhắn gửi ngay trên giao diện
         String timestamp = getCurrentTimestamp();
         MessageResponse displayMessage = new MessageResponse(content, 0, currentUserId, conversationId, timestamp, null);  // Placeholder for sender
 
@@ -224,7 +222,7 @@ public class MessageFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         if (webSocket != null) {
-            webSocket.close(1000, "Fragment destroyed"); // Đóng WebSocket khi Fragment bị hủy
+            webSocket.close(1000, "Fragment dừng");
         }
     }
 }
