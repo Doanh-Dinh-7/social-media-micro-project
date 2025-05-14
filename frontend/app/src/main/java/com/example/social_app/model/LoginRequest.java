@@ -16,11 +16,9 @@ public class LoginRequest {
     public void setEmail(String email) {
         this.Email = email;
     }
-
     public String getMatKhau() {
         return MatKhau;
     }
-
     public void setMatKhau(String matKhau) {
         this.MatKhau = matKhau;
     }

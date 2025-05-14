@@ -18,7 +18,6 @@ public class PostResponse  implements Serializable {
     private int so_binh_luan;
     private boolean da_thich;
 
-    // Getters and Setters
     public String getNoiDung() {
         return NoiDung;
     }

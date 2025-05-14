@@ -36,6 +36,7 @@ public class ThongBaoKetBanFragment extends Fragment {
     private LoiMoiAdapter adapter;
     private SuggestionAdapter suggestionAdapter;
     private String authToken;
+    private int currentUserId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,24 +49,20 @@ public class ThongBaoKetBanFragment extends Fragment {
         recyclerSuggestions = view.findViewById(R.id.recyclerSuggestions);
         recyclerSuggestions.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        // Lấy authToken từ SharedPreferences
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("auth_token", null);
 
-        // Kiểm tra nếu không có authToken
         if (authToken == null) {
             Toast.makeText(getContext(), "Token không hợp lệ, vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
             return view;
         }
 
-        // Lấy dữ liệu từ API
         getLoiMoiKetBanFromApi();
         getFriendSuggestions();
 
         return view;
     }
 
-    // Lấy danh sách lời mời kết bạn từ API
     private void getLoiMoiKetBanFromApi() {
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
         Call<List<LoiMoiKetBan>> call = apiService.getFriendRequest("Bearer " + authToken);
@@ -103,9 +100,6 @@ public class ThongBaoKetBanFragment extends Fragment {
         });
     }
 
-    // Lấy danh sách gợi ý kết bạn
-    // Gắn với phần cũ bạn đưa ở trên, giữ nguyên import...
-
     private void getFriendSuggestions() {
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
         Call<SuggestionsResponse> call = apiService.getFriendSuggestions("Bearer " + authToken);
@@ -122,9 +116,9 @@ public class ThongBaoKetBanFragment extends Fragment {
                                     @Override
                                     public void onAccept(NguoiDung nguoiDung) {
                                         if (nguoiDung.getQuanHe() == 2) {
-                                            cancelFriendRequest(nguoiDung); // đã gửi rồi thì hủy
+                                            cancelFriendRequest(nguoiDung);
                                         } else {
-                                            sendFriendRequest(nguoiDung); // chưa gửi thì gửi
+                                            sendFriendRequest(nguoiDung);
                                         }
                                     }
                                 });
@@ -155,12 +149,13 @@ public class ThongBaoKetBanFragment extends Fragment {
                     LoiMoiKetBan loiMoi = response.body();
                     int maLoiMoi = loiMoi.getMaLoiMoi();
 
+                    String key = "maLoiMoi_" + currentUserId + "_" + nguoiDung.getMaNguoiDung();
                     SharedPreferences preferences = getContext().getSharedPreferences("FriendRequests", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt("maLoiMoi_" + nguoiDung.getMaNguoiDung(), maLoiMoi);
+                    editor.putInt(key, maLoiMoi);
                     editor.apply();
 
-                    suggestionAdapter.updateUserStatus(nguoiDung, 2); // 2: đã gửi lời mời
+                    suggestionAdapter.updateUserStatus(nguoiDung, 2);
                     Toast.makeText(getContext(), "Đã gửi lời mời đến " + nguoiDung.getTenNguoiDung(), Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getContext(), "Không thể gửi lời mời", Toast.LENGTH_SHORT).show();
@@ -176,7 +171,8 @@ public class ThongBaoKetBanFragment extends Fragment {
 
     private void cancelFriendRequest(NguoiDung nguoiDung) {
         SharedPreferences preferences = getContext().getSharedPreferences("FriendRequests", Context.MODE_PRIVATE);
-        int maLoiMoi = preferences.getInt("maLoiMoi_" + nguoiDung.getMaNguoiDung(), -1);
+        String key = "maLoiMoi_" + currentUserId + "_" + nguoiDung.getMaNguoiDung();
+        int maLoiMoi = preferences.getInt(key, -1);
 
         if (maLoiMoi != -1) {
             ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
@@ -185,7 +181,7 @@ public class ThongBaoKetBanFragment extends Fragment {
                         @Override
                         public void onResponse(Call<LoiMoiKetBan> call, Response<LoiMoiKetBan> response) {
                             if (response.isSuccessful()) {
-                                suggestionAdapter.updateUserStatus(nguoiDung, 4); // 4: chưa kết bạn
+                                suggestionAdapter.updateUserStatus(nguoiDung, 4);
                                 Toast.makeText(getContext(), "Đã hủy lời mời kết bạn", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(getContext(), "Không thể hủy lời mời", Toast.LENGTH_SHORT).show();
@@ -203,7 +199,7 @@ public class ThongBaoKetBanFragment extends Fragment {
     }
 
     private void acceptFriendRequest(int maLoiMoi) {
-        TrangThaiRequest request = new TrangThaiRequest(1); // 1 là đồng ý
+        TrangThaiRequest request = new TrangThaiRequest(1);
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
         Call<Void> call = apiService.respondToFriendRequest(maLoiMoi, request, "Bearer " + authToken);
 

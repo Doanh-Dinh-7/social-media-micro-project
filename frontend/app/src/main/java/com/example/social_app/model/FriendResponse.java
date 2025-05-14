@@ -9,15 +9,12 @@ public class FriendResponse {
     public int getMaNguoiDung() {
         return MaNguoiDung;
     }
-
     public int getMaBanBe() {
         return MaBanBe;
     }
-
     public String getNgayTao() {
         return NgayTao;
     }
-
     public NguoiDung getBan() {
         return ban;
     }

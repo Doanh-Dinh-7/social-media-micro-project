@@ -119,9 +119,6 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
         void onSendFriendRequest(NguoiDung nguoiDung);
         void onCancelFriendRequest(NguoiDung nguoiDung);
     }
-    public interface OnUserClickListener {
-        void onUserClick(NguoiDung nguoiDung);
-    }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
         ImageView imgAvatar;

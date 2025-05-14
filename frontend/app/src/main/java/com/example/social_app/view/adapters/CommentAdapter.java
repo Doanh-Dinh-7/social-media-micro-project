@@ -3,7 +3,6 @@ package com.example.social_app.view.adapters;
 import android.content.Context;
 import android.os.Handler;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-// ... package và import không đổi
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
     private Context context;

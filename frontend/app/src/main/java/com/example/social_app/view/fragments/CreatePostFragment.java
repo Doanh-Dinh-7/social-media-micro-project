@@ -14,8 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -119,8 +117,6 @@ public class CreatePostFragment extends Fragment {
             }
         });
     }
-
-
 
     private void initViews(View view) {
         btnClose = view.findViewById(R.id.btnClose);
@@ -351,7 +347,6 @@ public class CreatePostFragment extends Fragment {
             return;
         }
 
-
         SharedPreferences preferences = getActivity().getSharedPreferences("user_data", Context.MODE_PRIVATE);
         String authToken = preferences.getString("auth_token", "");
 
@@ -360,7 +355,6 @@ public class CreatePostFragment extends Fragment {
             return;
         }
 
-        // Gửi request lên server
         sendPostToServer(authToken, noiDung, maQuyenRiengTu, maChuDe);
         ((PostActivity) getActivity()).showBottomNavigationView();
     }
@@ -368,17 +362,16 @@ public class CreatePostFragment extends Fragment {
     private void sendPostToServer(String authToken, String noiDung, int maQuyenRiengTu, Integer maChuDe) {
         ApiService apiService = RetrofitClient.getClient().create(ApiService.class);
 
-        // Các phần text
         RequestBody noiDungBody = RequestBody.create(MediaType.parse("text/plain"), noiDung);
         RequestBody quyenBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(maQuyenRiengTu));
         RequestBody chuDeBody = RequestBody.create(MediaType.parse("text/plain"), maChuDe != null ? String.valueOf(maChuDe) : "");
 
-        // Ảnh (multipart)
+
         List<MultipartBody.Part> imageParts = new ArrayList<>();
         if (selectedImageUris != null) {
             for (Uri uri : selectedImageUris) {
                 try {
-                    File resizedImage = resizeImage(uri); // ✅ resize ảnh trước khi gửi
+                    File resizedImage = resizeImage(uri);
                     RequestBody fileBody = RequestBody.create(MediaType.parse("image/*"), resizedImage);
                     MultipartBody.Part part = MultipartBody.Part.createFormData("images", resizedImage.getName(), fileBody);
                     imageParts.add(part);
@@ -426,7 +419,7 @@ public class CreatePostFragment extends Fragment {
 
         File file = new File(getActivity().getCacheDir(), getFileName(imageUri));
         FileOutputStream out = new FileOutputStream(file);
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out); // nén ảnh xuống 80% chất lượng
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
         out.flush();
         out.close();
 

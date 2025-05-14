@@ -61,7 +61,7 @@ public class MessageFragment extends Fragment {
     private WebSocket webSocket;
     private final Gson gson = new Gson();
 
-    private static final String SOCKET_BASE_URL = "ws://172.40.172.247:8000/api/messages/";
+    private static final String SOCKET_BASE_URL = "ws://192.168.0.109:8000/api/messages/";
 
     public MessageFragment() {}
 

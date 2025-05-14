@@ -72,7 +72,7 @@ public class ConversationFragment extends Fragment implements ConversationAdapte
                     conversationAdapter.updateList(conversationList);
                 } else {
                     recyclerView.setVisibility(View.VISIBLE);
-                    conversationAdapter.updateList(new ArrayList<>()); // clear
+                    conversationAdapter.updateList(new ArrayList<>());
                 }
             }
 

@@ -8,7 +8,6 @@ import com.example.social_app.model.FriendResponse;
 import com.example.social_app.model.LoginRequest;
 import com.example.social_app.model.LoginResponse;
 import com.example.social_app.model.LoiMoiKetBan;
-import com.example.social_app.model.MessageRequest;
 import com.example.social_app.model.MessageResponse;
 import com.example.social_app.model.NguoiDung;
 import com.example.social_app.model.PostResponse;
@@ -49,8 +48,8 @@ public interface ApiService {
             @Header("Authorization") String authToken,
             @Part("noi_dung") RequestBody noiDung,
             @Part("ma_quyen_rieng_tu") RequestBody maQuyenRiengTu,
-            @Part("ma_chu_de") RequestBody maChuDe, // Nếu có
-            @Part List<MultipartBody.Part> images // Danh sách ảnh (nếu có)
+            @Part("ma_chu_de") RequestBody maChuDe,
+            @Part List<MultipartBody.Part> images
     );
 
     @GET("posts")
@@ -111,11 +110,6 @@ public interface ApiService {
             @Header("Authorization") String authToken,
             @Query("keyword") String keyword);
 
-    @POST("messages")
-    Call<MessageResponse> sendMessage(
-            @Header("Authorization") String authToken,
-            @Body MessageRequest messageRequest
-    );
 
     @GET("messages/{user_id}")
     Call<List<MessageResponse>> getMessages(

@@ -19,7 +19,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,8 +29,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.social_app.R;
-import com.example.social_app.model.FriendRequest;
-import com.example.social_app.model.LoiMoiKetBan;
 import com.example.social_app.model.NguoiDung;
 import com.example.social_app.model.PostResponse;
 import com.example.social_app.view.adapters.UserAdapter;

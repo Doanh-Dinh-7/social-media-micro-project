@@ -1,7 +1,6 @@
 package com.example.social_app.model;
 
 public class UserInfoResponse {
-
     private String TenNguoiDung;
     private int MaNguoiDung;
     private String NgayTao;
@@ -11,7 +10,6 @@ public class UserInfoResponse {
     private int TrangThai;
     private int TheoDoi;
 
-    // Constructor
     public UserInfoResponse(String TenNguoiDung, int MaNguoiDung, String NgayTao, String AnhDaiDien, String AnhBia, String Email, int TrangThai, int TheoDoi) {
         this.TenNguoiDung = TenNguoiDung;
         this.MaNguoiDung = MaNguoiDung;

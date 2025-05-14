@@ -20,7 +20,6 @@ public class NguoiDung {
     public String getTenNguoiDung() {
         return TenNguoiDung;
     }
-
     public void setTenNguoiDung(String tenNguoiDung) {
         TenNguoiDung = tenNguoiDung;
     }
@@ -28,37 +27,30 @@ public class NguoiDung {
     public int getMaNguoiDung() {
         return MaNguoiDung;
     }
-
     public void setMaNguoiDung(int maNguoiDung) {
         MaNguoiDung = maNguoiDung;
     }
-
     public String getNgayTao() {
         return NgayTao;
     }
-
     public void setNgayTao(String ngayTao) {
         NgayTao = ngayTao;
     }
     public String getAnhDaiDien() {
         return AnhDaiDien;
     }
-
     public void setAnhDaiDien(String anhDaiDien) {
         AnhDaiDien = anhDaiDien;
     }
-
     public String getAnhBia() {
         return AnhBia;
     }
-
     public void setAnhBia(String anhBia) {
         AnhBia = anhBia;
     }
     public int getQuanHe() {
         return QuanHe;
     }
-
     public void setQuanHe(int quanHe) {
         QuanHe = quanHe;
     }

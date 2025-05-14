@@ -40,7 +40,6 @@
             android:layout_marginStart="16dp"
             android:layout_centerVertical="true">
 
-            <!-- Name Text -->
             <TextView
                 android:id="@+id/nameTextView"
                 android:layout_width="wrap_content"
@@ -89,12 +88,11 @@
             android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="11dp"
-            android:text="14 phút"
-            android:textColor="#999999"
-            android:textSize="12sp"
             android:layout_alignParentEnd="true"
-            />
+            android:layout_marginTop="11dp"
+            android:text="0 phút"
+            android:textColor="#999999"
+            android:textSize="12sp" />
 
     </RelativeLayout>
 

@@ -18,9 +18,9 @@ import com.example.social_app.view.activities.LoginActivity;
 import com.example.social_app.view.activities.RegisterActivity;
 
 public class LoginOptionsFragment extends Fragment {
+
     @Nullable
     @Override
-
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login_options, container, false);
         Button btnLogin = view.findViewById(R.id.btn_login);

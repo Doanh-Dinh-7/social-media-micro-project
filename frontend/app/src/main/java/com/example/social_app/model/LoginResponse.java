@@ -1,7 +1,5 @@
 package com.example.social_app.model;
 
-import com.example.social_app.model.NguoiDung;
-
 public class LoginResponse {
     private String access_token;
     private String refresh_token;
@@ -14,7 +12,6 @@ public class LoginResponse {
     public void setAccessToken(String access_token) {
         this.access_token = access_token;
     }
-
     public String getRefreshToken() {
         return refresh_token;
     }
@@ -27,6 +24,7 @@ public class LoginResponse {
     public void setTokenType(String token_type) {
         this.token_type = token_type;
     }
+
     public NguoiDung getUser() {
         return user;
     }

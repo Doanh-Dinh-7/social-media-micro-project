@@ -1,7 +1,5 @@
 package com.example.social_app.model;
 
-import com.google.gson.annotations.SerializedName;
-
 public class ThongBao {
     private int maThongBao;
     private int maNguoiDung;

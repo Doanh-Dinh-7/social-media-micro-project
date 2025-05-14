@@ -62,7 +62,7 @@ public class CommentFragment extends Fragment {
     private ImageView btnLike;
     private ImageView btnComment;
     private ImageView btnBack;
-
+    private PostResponse currentPost;
     private int postId;
 
     @Override
@@ -226,8 +226,6 @@ public class CommentFragment extends Fragment {
             }
         });
     }
-
-    private PostResponse currentPost;
 
     private void loadPostInfo(int postId) {
         apiService.getPostById("Bearer " + authToken, postId).enqueue(new Callback<PostResponse>() {

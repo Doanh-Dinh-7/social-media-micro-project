@@ -1,47 +1,38 @@
 package com.example.social_app.model;
 
-import com.google.gson.annotations.SerializedName;
-
 public class HinhAnh {
-
-    @SerializedName("MaHinhAnh")
-    private int maHinhAnh;
-
-    @SerializedName("MaBaiDang")
-    private int maBaiDang;
-
-    @SerializedName("Url")
-    private String url;
-
+    private int MaHinhAnh;
+    private int MaBaiDang;
+    private String Url;
     public HinhAnh() {}
 
-    public HinhAnh(int maHinhAnh, int maBaiDang, String url) {
-        this.maHinhAnh = maHinhAnh;
-        this.maBaiDang = maBaiDang;
-        this.url = url;
+    public HinhAnh(int MaHinhAnh, int MaBaiDang, String Url) {
+        this.MaHinhAnh = MaHinhAnh;
+        this.MaBaiDang = MaBaiDang;
+        this.Url = Url;
     }
 
     public int getMaHinhAnh() {
-        return maHinhAnh;
+        return MaHinhAnh;
     }
 
-    public void setMaHinhAnh(int maHinhAnh) {
-        this.maHinhAnh = maHinhAnh;
+    public void setMaHinhAnh(int MaHinhAnh) {
+        this.MaHinhAnh = MaHinhAnh;
     }
 
     public int getMaBaiDang() {
-        return maBaiDang;
+        return MaBaiDang;
     }
 
-    public void setMaBaiDang(int maBaiDang) {
-        this.maBaiDang = maBaiDang;
+    public void setMaBaiDang(int MaBaiDang) {
+        this.MaBaiDang = MaBaiDang;
     }
 
     public String getUrl() {
-        return url;
+        return Url;
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.Url = Url;
     }
 }

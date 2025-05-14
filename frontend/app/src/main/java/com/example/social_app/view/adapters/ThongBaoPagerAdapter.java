@@ -9,7 +9,7 @@ import com.example.social_app.view.fragments.BaiVietThongBaoFragment;
 import com.example.social_app.view.fragments.ThongBaoKetBanFragment;
 
 
-import androidx.fragment.app.FragmentActivity; // Thêm import này
+import androidx.fragment.app.FragmentActivity;
 
 public class ThongBaoPagerAdapter extends FragmentStateAdapter {
 

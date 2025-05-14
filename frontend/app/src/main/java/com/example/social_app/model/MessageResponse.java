@@ -18,7 +18,6 @@ public class MessageResponse {
         this.nguoi_gui = nguoi_gui;
     }
 
-    // Getter and Setter methods
     public String getNoiDung() {
         return NoiDung;
     }

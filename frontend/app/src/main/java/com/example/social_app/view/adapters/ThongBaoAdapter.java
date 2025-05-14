@@ -3,7 +3,6 @@ package com.example.social_app.view.adapters;
 import android.content.Context;
 import android.os.Handler;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +18,9 @@ import com.example.social_app.model.ThongBao;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 
 public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ViewHolder> {
@@ -69,6 +66,12 @@ public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ViewHo
     }
 
     @Override
+    public void onViewRecycled(@NonNull ThongBaoAdapter.ViewHolder holder) {
+        holder.unbind();
+        super.onViewRecycled(holder);
+    }
+
+    @Override
     public int getItemCount() {
         return thongBaoList != null ? thongBaoList.size() : 0;
     }
@@ -88,59 +91,37 @@ public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ViewHo
         }
 
         public void bindTime(String ngayTao) {
-            if (ngayTao == null) {
-                thoiGian.setText("");
-                return;
-            }
-
             originalTime = ngayTao;
             updateTime();
 
-            if (timeUpdater != null) {
-                handler.removeCallbacks(timeUpdater);
-            }
+            if (timeUpdater != null) handler.removeCallbacks(timeUpdater);
 
-            timeUpdater = new Runnable() {
-                @Override
-                public void run() {
-                    updateTime();
-                    handler.postDelayed(this, 60000); // cập nhật mỗi phút
-                }
+            timeUpdater = () -> {
+                updateTime();
+                handler.postDelayed(timeUpdater, 60000);
             };
             handler.postDelayed(timeUpdater, 60000);
         }
 
+        public void unbind() {
+            if (timeUpdater != null) {
+                handler.removeCallbacks(timeUpdater);
+                timeUpdater = null;
+            }
+        }
+
         private void updateTime() {
-            thoiGian.setText(getTimeAgo(originalTime));
+            thoiGian.setText(ThongBaoAdapter.getTimeAgo(originalTime));
         }
     }
 
     public static String getTimeAgo(String isoTime) {
-        Log.d("DEBUG_TIME", "Chuỗi gốc từ API: " + isoTime);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
         try {
-            // Cắt bớt phần microseconds nếu có
-            if (isoTime.contains(".")) {
-                int dotIndex = isoTime.indexOf(".");
-                isoTime = isoTime.substring(0, dotIndex + 4); // giữ lại 3 chữ số sau dấu chấm
-                Log.d("DEBUG_TIME", "Chuỗi sau khi cắt: " + isoTime);
-            }
-
-            // Parse chuỗi thành Date
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault());
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC")); // Thời gian từ API là UTC
-            Date parsedDate = sdf.parse(isoTime);
-            if (parsedDate == null) {
-                Log.e("DEBUG_TIME", "parsedDate bị null");
-                return "";
-            }
-
-            long timeInMillis = parsedDate.getTime();
+            Date commentDate = sdf.parse(isoTime);
             long now = System.currentTimeMillis();
-            long diff = Math.max(0, now - timeInMillis);
-
-            Log.d("DEBUG_TIME", "Thời gian parse (millis): " + timeInMillis);
-            Log.d("DEBUG_TIME", "Hiện tại (millis): " + now);
-            Log.d("DEBUG_TIME", "Chênh lệch (ms): " + diff);
+            long time = commentDate.getTime();
+            long diff = now - time;
 
             if (diff < DateUtils.MINUTE_IN_MILLIS) {
                 return "Vừa xong";
@@ -149,15 +130,13 @@ public class ThongBaoAdapter extends RecyclerView.Adapter<ThongBaoAdapter.ViewHo
             } else if (diff < DateUtils.DAY_IN_MILLIS) {
                 return (diff / DateUtils.HOUR_IN_MILLIS) + " giờ trước";
             } else if (diff < 2 * DateUtils.DAY_IN_MILLIS) {
-                SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                return "Hôm qua lúc " + hourFormat.format(parsedDate);
+                return "Hôm qua lúc " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(commentDate);
             } else {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd 'Tháng' MM 'lúc' HH:mm", Locale.getDefault());
-                return dateFormat.format(parsedDate);
+                return new SimpleDateFormat("dd 'Tháng' MM 'lúc' HH:mm", Locale.getDefault()).format(commentDate);
             }
 
         } catch (ParseException e) {
-            Log.e("DEBUG_TIME", "Lỗi parse thời gian: " + e.getMessage());
+            e.printStackTrace();
             return "";
         }
     }

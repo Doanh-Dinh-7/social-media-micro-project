@@ -6,8 +6,8 @@
     </style>
 
     <style name="CustomCheckboxTheme" parent="Theme.MaterialComponents.Light">
-        <item name="colorControlNormal">#FFBE64</item>  <!-- Màu viền khi chưa chọn -->
-        <item name="colorControlActivated">#FFBE64</item> <!-- Màu viền khi đã chọn -->
+        <item name="colorControlNormal">#FFBE64</item>
+        <item name="colorControlActivated">#FFBE64</item>
     </style>
 
     <style name="BottomNavigationStyle" parent="Widget.MaterialComponents.BottomNavigationView">

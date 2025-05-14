@@ -1,6 +1,5 @@
 package com.example.social_app.view.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -48,7 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         Bundle bundle = new Bundle();
         bundle.putString("EMAIL", email);
-        bundle.putString("TOKEN", token);  // Chuyển token vào UserInforFragment
+        bundle.putString("TOKEN", token);
 
         UserInforFragment userInforFragment = new UserInforFragment();
         userInforFragment.setArguments(bundle);
@@ -67,7 +66,7 @@ public class RegisterActivity extends AppCompatActivity {
                     String token = response.body().getAccessToken();
                     getSharedPreferences("MyPrefs", MODE_PRIVATE)
                             .edit()
-                            .putString("TOKEN", token)  // Lưu token
+                            .putString("TOKEN", token)
                             .apply();
 
                     Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();

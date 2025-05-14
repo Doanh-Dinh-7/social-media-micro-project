@@ -1,6 +1,8 @@
 package com.example.social_app.view.adapters;
 
 import android.content.Context;
+import android.os.Handler;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +17,11 @@ import com.example.social_app.R;
 import com.example.social_app.model.LoiMoiKetBan;
 import com.google.android.material.button.MaterialButton;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class LoiMoiAdapter extends RecyclerView.Adapter<LoiMoiAdapter.LoiMoiViewHolder> {
 
@@ -58,33 +56,9 @@ public class LoiMoiAdapter extends RecyclerView.Adapter<LoiMoiAdapter.LoiMoiView
                 .placeholder(R.mipmap.user_img)
                 .into(holder.avatarImageView);
 
-        // Gán tên người gửi (giả sử LoiMoiKetBan có getNguoiGui().getTenNguoiDung())
         holder.nameTextView.setText(loiMoi.getNguoi_gui().getTenNguoiDung());
+        holder.bindTime(loiMoi.getThoiGian());
 
-        // Gán thời gian gửi
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault());
-            Date sendTime = sdf.parse(loiMoi.getThoiGian());
-            long diff = new Date().getTime() - sendTime.getTime();
-
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-            long hours = TimeUnit.MILLISECONDS.toHours(diff);
-            long days = TimeUnit.MILLISECONDS.toDays(diff);
-
-            if (minutes < 60) {
-                holder.timeTextView.setText(minutes + " phút");
-            } else if (hours < 24) {
-                holder.timeTextView.setText(hours + " giờ");
-            } else {
-                holder.timeTextView.setText(days + " ngày");
-            }
-        } catch (Exception e) {
-            holder.timeTextView.setText("Không rõ thời gian");
-        }
-
-
-
-        // Xử lý sự kiện nút
         holder.acceptButton.setOnClickListener(v -> listener.onAccept(loiMoi.getMaLoiMoi()));
         holder.deleteButton.setOnClickListener(v -> listener.onDelete(loiMoi.getMaLoiMoi()));
     }
@@ -94,10 +68,45 @@ public class LoiMoiAdapter extends RecyclerView.Adapter<LoiMoiAdapter.LoiMoiView
         return loiMoiList.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull LoiMoiAdapter.LoiMoiViewHolder holder) {
+        holder.unbind();
+        super.onViewRecycled(holder);
+    }
+
+    public static String getTimeAgo(String isoTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+        try {
+            Date commentDate = sdf.parse(isoTime);
+            long now = System.currentTimeMillis();
+            long time = commentDate.getTime();
+            long diff = now - time;
+
+            if (diff < DateUtils.MINUTE_IN_MILLIS) {
+                return "Vừa xong";
+            } else if (diff < DateUtils.HOUR_IN_MILLIS) {
+                return (diff / DateUtils.MINUTE_IN_MILLIS) + " phút trước";
+            } else if (diff < DateUtils.DAY_IN_MILLIS) {
+                return (diff / DateUtils.HOUR_IN_MILLIS) + " giờ trước";
+            } else if (diff < 2 * DateUtils.DAY_IN_MILLIS) {
+                return "Hôm qua lúc " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(commentDate);
+            } else {
+                return new SimpleDateFormat("dd 'Tháng' MM 'lúc' HH:mm", Locale.getDefault()).format(commentDate);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static class LoiMoiViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView, timeTextView;
         MaterialButton acceptButton, deleteButton;
         ImageView avatarImageView;
+        private Handler handler = new Handler();
+        private Runnable timeUpdater;
+        private String originalTime;
 
         public LoiMoiViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -106,6 +115,30 @@ public class LoiMoiAdapter extends RecyclerView.Adapter<LoiMoiAdapter.LoiMoiView
             acceptButton = itemView.findViewById(R.id.acceptButton);
             deleteButton = itemView.findViewById(R.id.deleteButton);
             avatarImageView = itemView.findViewById(R.id.avatarImageView);
+        }
+
+        public void bindTime(String ngayTao) {
+            originalTime = ngayTao;
+            updateTime();
+
+            if (timeUpdater != null) handler.removeCallbacks(timeUpdater);
+
+            timeUpdater = () -> {
+                updateTime();
+                handler.postDelayed(timeUpdater, 60000);
+            };
+            handler.postDelayed(timeUpdater, 60000);
+        }
+
+        public void unbind() {
+            if (timeUpdater != null) {
+                handler.removeCallbacks(timeUpdater);
+                timeUpdater = null;
+            }
+        }
+
+        private void updateTime() {
+            timeTextView.setText(LoiMoiAdapter.getTimeAgo(originalTime));
         }
     }
     public void removeLoiMoiById(int maLoiMoi) {

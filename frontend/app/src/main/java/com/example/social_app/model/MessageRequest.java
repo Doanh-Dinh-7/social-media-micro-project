@@ -5,7 +5,6 @@ public class MessageRequest {
     private int MaCuocTroChuyen;
     private int NguoiNhan;
 
-    // Constructor, Getters, and Setters
     public MessageRequest(String noiDung, int maCuocTroChuyen, int nguoiNhan) {
         this.NoiDung = noiDung;
         this.MaCuocTroChuyen = maCuocTroChuyen;

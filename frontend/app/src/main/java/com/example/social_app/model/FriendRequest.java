@@ -6,11 +6,9 @@ public class FriendRequest {
     public FriendRequest(int nguoiNhan) {
         this.NguoiNhan = nguoiNhan;
     }
-
     public int getNguoiNhan() {
         return NguoiNhan;
     }
-
     public void setNguoiNhan(int nguoiNhan) {
         this.NguoiNhan = nguoiNhan;
     }
