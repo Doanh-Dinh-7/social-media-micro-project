@@ -1,5 +1,7 @@
 # social-media-micro-project
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Mô tả
 
 Dự án **social-media-micro-project** là một mạng xã hội mini, nơi người dùng có thể kết nối, chia sẻ, trò chuyện và tương tác với nhau. Dự án hướng tới việc thực hành teamwork, phát triển ứng dụng thực tế, áp dụng các công nghệ hiện đại cả Backend lẫn Mobile.
