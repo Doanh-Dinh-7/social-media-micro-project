@@ -2,9 +2,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+[Preview: 2T-QND Social](https://www.figma.com/proto/IWdDENHdJsn99LxLzPBg9T/MXH-app)
+
 ## Mô tả
 
-Dự án **social-media-micro-project** là một mạng xã hội mini, nơi người dùng có thể kết nối, chia sẻ, trò chuyện và tương tác với nhau. Dự án hướng tới việc thực hành teamwork, phát triển ứng dụng thực tế, áp dụng các công nghệ hiện đại cả Backend lẫn Mobile.
+Dự án **2T-QND Social** (social-media-micro-project) là một mạng xã hội mini, nơi người dùng có thể kết nối, chia sẻ, trò chuyện và tương tác với nhau. Dự án hướng tới việc thực hành teamwork, phát triển ứng dụng thực tế, áp dụng các công nghệ hiện đại cả Backend lẫn Mobile.
 
 ## Tính năng chính
 - Đăng ký, đăng nhập, xác thực người dùng
@@ -45,11 +47,11 @@ Dự án **social-media-micro-project** là một mạng xã hội mini, nơi ng
 </table> 
 
 ## Thành viên nhóm
-- **Đinh Sỹ Quốc Doanh** (Leader project, Backend)
-- **Nguyễn Anh Tú** (Database)
-- **Trần Tấn Quân** (Database)
-- **Lê Hoàng Anh Thư** (Frontend Mobile)
-- **Phạm Thị Hoài Ngọc** (Frontend Mobile)
+- **Đinh Sỹ Quốc Doanh** (Leader project)
+- **Nguyễn Anh Tú** 
+- **Trần Tấn Quân** 
+- **Lê Hoàng Anh Thư** 
+- **Phạm Thị Hoài Ngọc**
 
 ## Công nghệ sử dụng
 - **Backend:** Python, FastAPI, SQLAlchemy, Cloudinary, Websocket
